@@ -1,0 +1,7 @@
+{
+  "name": "carousell-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
