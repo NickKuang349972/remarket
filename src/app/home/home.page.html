@@ -18,6 +18,40 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  <!-- 分類篩選 -->
+  <div class="chips">
+    @for (category of categories; track category) {
+      <ion-chip
+        class="chip"
+        [class.active]="selectedCategory === category"
+        (click)="selectCategory(category)"
+      >
+        {{ category }}
+      </ion-chip>
+    }
+  </div>
+
+  <!-- 排序 -->
+  <ion-segment
+    class="sort"
+    [value]="sortBy"
+    (ionChange)="onSortChange($event)"
+    [disabled]="isLoading"
+  >
+    <ion-segment-button value="new">
+      <ion-label>最新</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="priceAsc">
+      <ion-label>價格 ↑</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="priceDesc">
+      <ion-label>價格 ↓</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="distance">
+      <ion-label>距離</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
   <ion-grid class="ion-no-padding">
     <ion-row>
       <!-- 載入中：顯示骨架卡片 -->
@@ -47,11 +81,27 @@
               } @else {
                 <div class="thumb-placeholder">暫無圖片</div>
               }
+
+              <ion-button
+                class="fav"
+                fill="clear"
+                size="small"
+                [class.is-favorite]="userData.isFavorite(item.id)"
+                (click)="toggleFavorite($event, item.id)"
+              >
+                <ion-icon
+                  slot="icon-only"
+                  [name]="userData.isFavorite(item.id) ? 'heart' : 'heart-outline'"
+                ></ion-icon>
+              </ion-button>
             </div>
 
             <ion-card-content class="card-body">
               <p class="price">HK$ {{ item.price }}</p>
               <p class="title">{{ item.title }}</p>
+              @if (metaText(item)) {
+                <p class="addr">{{ metaText(item) }}</p>
+              }
             </ion-card-content>
           </ion-card>
         </ion-col>

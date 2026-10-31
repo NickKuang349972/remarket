@@ -6,6 +6,39 @@ ion-searchbar {
   padding-bottom: 6px;
 }
 
+.sort {
+  margin: 8px 8px 4px;
+  border-radius: 10px;
+  --background: #ffffff;
+}
+
+/* 分類 chips：可橫向滑動 */
+.chips {
+  display: flex;
+  gap: 8px;
+  padding: 10px 8px 0;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.chip {
+  flex: 0 0 auto;
+  height: 32px;
+  margin: 0;
+  --background: #ffffff;
+  color: #3d5342;
+  font-size: 13px;
+
+  &.active {
+    --background: var(--ion-color-primary);
+    color: #ffffff;
+  }
+}
+
 ion-grid {
   padding: 8px 6px 24px;
 }
@@ -55,6 +88,29 @@ ion-grid {
   font-size: 12px;
 }
 
+/* 愛心按鈕浮在圖片右上角 */
+.fav {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --background: rgba(255, 255, 255, 0.85);
+  --border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+
+  ion-icon {
+    color: #8a8a8a;
+    font-size: 18px;
+  }
+
+  &.is-favorite ion-icon {
+    color: #e0245e;
+  }
+}
+
 .card-body {
   padding: 8px 10px 10px;
 }
@@ -75,6 +131,12 @@ ion-grid {
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.addr {
+  margin: 4px 0 0;
+  color: #8a9a8e;
+  font-size: 11px;
 }
 
 .empty-state {

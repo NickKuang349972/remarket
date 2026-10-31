@@ -11,24 +11,66 @@
     <p class="slogan">二手物品，找到新主人</p>
   </div>
 
-  <ion-card class="stat-card">
-    <ion-card-content>
-      <p class="stat-value">{{ productCount }}</p>
-      <p class="stat-label">件商品正在發售</p>
-    </ion-card-content>
-  </ion-card>
+  <ion-grid class="ion-no-padding stats">
+    <ion-row>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <p class="stat-value">{{ myProducts.length }}</p>
+            <p class="stat-label">我的刊登</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <p class="stat-value">{{ favoriteProducts.length }}</p>
+            <p class="stat-label">我的收藏</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-  <ion-list lines="full" class="about">
+  <h3 class="section-title">我的刊登</h3>
+  @if (myProducts.length > 0) {
+    <ion-list lines="none" class="item-list">
+      @for (item of myProducts; track item.id) {
+        <ion-item [routerLink]="['/product', item.id]" detail="true">
+          <ion-img class="thumb" [src]="imageUrl(item.image)" [alt]="item.title"></ion-img>
+          <ion-label>
+            <h2>{{ item.title }}</h2>
+            <p>HK$ {{ item.price }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <p class="empty">還沒有刊登過商品，去「刊登」頁試試吧。</p>
+  }
+
+  <h3 class="section-title">我的收藏</h3>
+  @if (favoriteProducts.length > 0) {
+    <ion-list lines="none" class="item-list">
+      @for (item of favoriteProducts; track item.id) {
+        <ion-item [routerLink]="['/product', item.id]" detail="true">
+          <ion-img class="thumb" [src]="imageUrl(item.image)" [alt]="item.title"></ion-img>
+          <ion-label>
+            <h2>{{ item.title }}</h2>
+            <p>HK$ {{ item.price }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <p class="empty">在商品卡片上按愛心，就會出現在這裡。</p>
+  }
+
+  <h3 class="section-title">關於</h3>
+  <ion-list lines="full" class="item-list">
     <ion-item>
       <ion-label>
-        <h3>關於 ReMarket</h3>
-        <p>以 Ionic + Angular 製作的二手買賣平台</p>
-      </ion-label>
-      <ion-note slot="end">v1.0</ion-note>
-    </ion-item>
-    <ion-item>
-      <ion-label>
-        <h3>技術架構</h3>
+        <h2>ReMarket</h2>
         <p>Ionic / Angular / Leaflet / PHP / MySQL</p>
       </ion-label>
     </ion-item>

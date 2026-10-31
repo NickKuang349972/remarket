@@ -30,8 +30,12 @@
   font-size: 13px;
 }
 
+.stats {
+  margin-top: 16px;
+}
+
 .stat-card {
-  margin: 20px 0;
+  margin: 0;
   border-radius: 12px;
   text-align: center;
 }
@@ -49,7 +53,33 @@
   font-size: 13px;
 }
 
-.about {
+.section-title {
+  margin: 22px 0 8px;
+  color: #1f2621;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.item-list {
   border-radius: 12px;
   overflow: hidden;
+  background: #ffffff;
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  margin-right: 12px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f2f2f2;
+}
+
+.empty {
+  margin: 0 0 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #9aa89d;
+  font-size: 13px;
 }

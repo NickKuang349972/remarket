@@ -12,6 +12,10 @@ export interface Product {
   description: string;
   /** 圖片路徑，例如 http://localhost/remarket-backend/uploads/xxx.jpg */
   image?: string;
+  /** 商品分類，例如「電子產品」「傢俬」 */
+  category?: string;
+  /** 賣家填寫的地區名，例如「旺角」 */
+  address?: string;
   lat?: number;
   lng?: number;
 }
@@ -21,16 +25,20 @@ export interface AddProductInput {
   title: string;
   price: number;
   description: string;
+  category: string;
+  address: string;
   image?: File | null;
   lat: number;
   lng: number;
 }
 
-/** 後端統一回傳格式：{ status: 'success' | 'error', data?, message? } */
+/** 後端統一回傳格式：{ status: 'success' | 'error', data?, message?, id? } */
 interface ApiResponse<T> {
   status: 'success' | 'error';
   data?: T;
   message?: string;
+  /** add_product.php 成功時會回傳新商品的 id */
+  id?: number;
 }
 
 /**
@@ -74,12 +82,14 @@ export class ProductService {
     return path.startsWith('http') ? path : `${this.baseUrl}/${path}`;
   }
 
-  /** 新增商品：以 multipart/form-data 送出，可附帶一張相片 */
-  async addProduct(input: AddProductInput): Promise<void> {
+  /** 新增商品：以 multipart/form-data 送出，可附帶一張相片；成功時回傳新商品 id */
+  async addProduct(input: AddProductInput): Promise<number | undefined> {
     const form = new FormData();
     form.append('title', input.title);
     form.append('price', String(input.price));
     form.append('description', input.description);
+    form.append('category', input.category);
+    form.append('address', input.address);
     form.append('lat', String(input.lat));
     form.append('lng', String(input.lng));
 
@@ -93,6 +103,47 @@ export class ProductService {
 
     if (response.status !== 'success') {
       throw new Error(response.message ?? '刊登失敗');
+    }
+
+    return response.id;
+  }
+
+  /** 更新商品資料（可選擇換一張相片） */
+  async updateProduct(id: number, input: AddProductInput): Promise<void> {
+    const form = new FormData();
+    form.append('id', String(id));
+    form.append('title', input.title);
+    form.append('price', String(input.price));
+    form.append('description', input.description);
+    form.append('category', input.category);
+    form.append('address', input.address);
+    form.append('lat', String(input.lat));
+    form.append('lng', String(input.lng));
+
+    if (input.image) {
+      form.append('image', input.image);
+    }
+
+    const response = await firstValueFrom(
+      this.http.post<ApiResponse<never>>(`${this.baseUrl}/update_product.php`, form),
+    );
+
+    if (response.status !== 'success') {
+      throw new Error(response.message ?? '更新失敗');
+    }
+  }
+
+  /** 刪除商品 */
+  async deleteProduct(id: number): Promise<void> {
+    const form = new FormData();
+    form.append('id', String(id));
+
+    const response = await firstValueFrom(
+      this.http.post<ApiResponse<never>>(`${this.baseUrl}/delete_product.php`, form),
+    );
+
+    if (response.status !== 'success') {
+      throw new Error(response.message ?? '刪除失敗');
     }
   }
 }

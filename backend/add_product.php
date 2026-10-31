@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $title = trim($_POST['title'] ?? '');
 $price = $_POST['price'] ?? '';
 $description = trim($_POST['description'] ?? '');
+$category = trim($_POST['category'] ?? '其他');
+$address = trim($_POST['address'] ?? '');
 $lat = $_POST['lat'] ?? '';
 $lng = $_POST['lng'] ?? '';
 
@@ -76,14 +78,16 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $stmt = $pdo->prepare(
-        "INSERT INTO products (title, price, description, image, lat, lng)
-         VALUES (:title, :price, :description, :image, :lat, :lng)"
+        "INSERT INTO products (title, price, description, category, address, image, lat, lng)
+         VALUES (:title, :price, :description, :category, :address, :image, :lat, :lng)"
     );
 
     $stmt->execute([
         ':title'       => $title,
         ':price'       => (int) $price,
         ':description' => $description,
+        ':category'    => $category,
+        ':address'     => $address,
         ':image'       => $imagePath,
         ':lat'         => $lat,
         ':lng'         => $lng,

@@ -1,18 +1,23 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   IonCard,
   IonCardContent,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
+  IonImg,
   IonItem,
   IonLabel,
   IonList,
-  IonNote,
+  IonRow,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular';
 
-import { ProductService } from '../services/product.service';
+import { Product, ProductService } from '../services/product.service';
+import { UserDataService } from '../services/user-data.service';
 
 @Component({
   selector: 'app-profile',
@@ -20,28 +25,52 @@ import { ProductService } from '../services/product.service';
   styleUrls: ['profile.page.scss'],
   standalone: true,
   imports: [
+    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
+    IonGrid,
+    IonRow,
+    IonCol,
     IonCard,
     IonCardContent,
     IonList,
     IonItem,
     IonLabel,
-    IonNote,
+    IonImg,
   ],
 })
 export class ProfilePage {
-  productCount = 0;
+  myProducts: Product[] = [];
+  favoriteProducts: Product[] = [];
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private cdr: ChangeDetectorRef,
+    public userData: UserDataService,
+  ) {}
 
   async ionViewWillEnter() {
+    let products: Product[] = [];
+
     try {
-      this.productCount = (await this.productService.getProducts()).length;
-    } catch {
-      this.productCount = 0;
+      products = await this.productService.getProducts();
+    } catch (error) {
+      console.error('載入我的資料失敗', error);
     }
+
+    const myIds = this.userData.myListingIds.map(Number);
+    const favoriteIds = this.userData.favoriteIds.map(Number);
+
+    this.myProducts = products.filter((product) => myIds.includes(Number(product.id)));
+    this.favoriteProducts = products.filter((product) => favoriteIds.includes(Number(product.id)));
+
+    // 無 zone 模式：async 之後要主動通知 Angular 重畫
+    this.cdr.markForCheck();
+  }
+
+  imageUrl(path?: string): string | undefined {
+    return this.productService.imageUrl(path);
   }
 }

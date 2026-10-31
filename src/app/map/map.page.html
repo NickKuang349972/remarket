@@ -4,6 +4,12 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content>
   <div #mapContainer id="map"></div>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="locate-fab">
+    <ion-fab-button size="small" (click)="locateMe()" aria-label="定位到我的位置">
+      <ion-icon name="locate-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

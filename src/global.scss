@@ -47,3 +47,14 @@
   background: var(--ion-color-primary);
   box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
 }
+
+/* 地圖上的「我的位置」藍點 */
+.me-pin span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: #1a73e8;
+  box-shadow: 0 0 0 6px rgb(26 115 232 / 20%);
+}

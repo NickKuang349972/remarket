@@ -45,6 +45,23 @@
     ></ion-textarea>
   </ion-item>
 
+  <ion-item lines="none" class="field">
+    <ion-select label="分類" labelPlacement="stacked" interface="popover" [(ngModel)]="category">
+      @for (option of categories; track option) {
+        <ion-select-option [value]="option">{{ option }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item lines="none" class="field">
+    <ion-input
+      label="地區"
+      labelPlacement="stacked"
+      placeholder="例如：旺角、沙田市中心"
+      [(ngModel)]="addressText"
+    ></ion-input>
+  </ion-item>
+
   <div class="location">
     <ion-button fill="outline" size="small" [disabled]="isLocating" (click)="useCurrentLocation()">
       @if (isLocating) {
@@ -58,6 +75,10 @@
       <span class="coords">已定位：{{ lat }}, {{ lng }}</span>
     } @else {
       <span class="coords muted">未定位，預設使用旺角</span>
+    }
+
+    @if (isLookingUpAddress) {
+      <span class="coords muted">正在查詢地區…</span>
     }
   </div>
 

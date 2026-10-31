@@ -3,7 +3,24 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" text="返回"></ion-back-button>
     </ion-buttons>
+
     <ion-title>商品詳情</ion-title>
+
+    @if (product) {
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleFavorite()">
+          <ion-icon
+            slot="icon-only"
+            [name]="isFavorite ? 'heart' : 'heart-outline'"
+            [style.color]="isFavorite ? '#ff8fab' : '#ffffff'"
+          ></ion-icon>
+        </ion-button>
+
+        <ion-button (click)="share()">
+          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
   </ion-toolbar>
 </ion-header>
 
@@ -25,7 +42,7 @@
   } @else if (product) {
     <div class="photo">
       @if (product.image) {
-        <ion-img [src]="imageUrl(product.image)" [alt]="product.title"></ion-img>
+        <img class="hero" [src]="imageUrl(product.image)" [alt]="product.title" />
       } @else {
         <div class="photo-placeholder">暫無圖片</div>
       }
@@ -35,14 +52,104 @@
       <p class="price">HK$ {{ product.price }}</p>
       <h2 class="title">{{ product.title }}</h2>
 
-      @if (product.lat && product.lng) {
-        <p class="location">📍 地圖位置 {{ product.lat }}, {{ product.lng }}</p>
+      @if (product.category) {
+        <p class="category">{{ product.category }}</p>
+      }
+
+      @if (product.address) {
+        <p class="location">📍 {{ product.address }}</p>
+      } @else if (product.lat && product.lng) {
+        <p class="location">📍 {{ product.lat }}, {{ product.lng }}</p>
       }
 
       <div class="section">
         <h3>商品說明</h3>
         <p class="description">{{ product.description || '賣家沒有提供說明' }}</p>
       </div>
+
+      @if (isMine) {
+        <div class="owner-actions">
+          <ion-button fill="outline" size="small" (click)="openEdit()">
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            編輯
+          </ion-button>
+
+          <ion-button fill="outline" size="small" color="danger" (click)="confirmDelete()">
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            刪除
+          </ion-button>
+        </div>
+      }
     </div>
   }
 </ion-content>
+
+<ion-modal [isOpen]="isEditOpen" (didDismiss)="closeEdit()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+          <ion-button (click)="closeEdit()">取消</ion-button>
+        </ion-buttons>
+
+        <ion-title>編輯商品</ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button [disabled]="isSaving" (click)="saveEdit()">儲存</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-item lines="none" class="field">
+        <ion-input label="商品標題" labelPlacement="stacked" [(ngModel)]="editTitle"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="field">
+        <ion-input
+          label="價格 (HK$)"
+          labelPlacement="stacked"
+          type="number"
+          inputmode="decimal"
+          [(ngModel)]="editPrice"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="field">
+        <ion-select
+          label="分類"
+          labelPlacement="stacked"
+          interface="popover"
+          [(ngModel)]="editCategory"
+        >
+          @for (option of categories; track option) {
+            <ion-select-option [value]="option">{{ option }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="none" class="field">
+        <ion-input
+          label="地區"
+          labelPlacement="stacked"
+          placeholder="例如：旺角"
+          [(ngModel)]="editAddress"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="field">
+        <ion-textarea
+          label="商品說明"
+          labelPlacement="stacked"
+          [autoGrow]="true"
+          [rows]="4"
+          [(ngModel)]="editDescription"
+        ></ion-textarea>
+      </ion-item>
+
+      @if (editError) {
+        <p class="error">{{ editError }}</p>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -17,13 +17,15 @@ CREATE TABLE products (
   title VARCHAR(100) NOT NULL,
   price INT(11) NOT NULL,
   description TEXT NOT NULL,
+  category VARCHAR(30) NOT NULL DEFAULT '其他',
+  address VARCHAR(150) NOT NULL DEFAULT '',
   image VARCHAR(255) NOT NULL,
   lat DECIMAL(10, 8) NOT NULL,
   lng DECIMAL(11, 8) NOT NULL,
   PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
-INSERT INTO products (title, price, description, image, lat, lng) VALUES
-('復古單車 26吋 7成新', 850, '買咗兩年，少踩，鏈條新換，附車鎖。旺角自取。', 'https://picsum.photos/seed/bike/600/600', 22.31930000, 114.16940000),
-('IKEA 書枱 白色', 300, '120x60cm，有少許使用痕跡，需自行搬運。', 'https://picsum.photos/seed/desk/600/600', 22.28190000, 114.15820000),
-('Sony 頭戴式耳機 WH-1000XM4', 1200, '95新，有盒有單，功能完全正常。', 'https://picsum.photos/seed/headphone/600/600', 22.37710000, 114.19740000);
+INSERT INTO products (title, price, description, category, address, image, lat, lng) VALUES
+('復古單車 26吋 7成新', 850, '買咗兩年，少踩，鏈條新換，附車鎖。旺角自取。', '運動', '旺角', 'demo-images/bike.svg', 22.31930000, 114.16940000),
+('IKEA 書枱 白色', 300, '120x60cm，有少許使用痕跡，需自行搬運。', '傢俬', '中環', 'demo-images/desk.svg', 22.28190000, 114.15820000),
+('Sony 頭戴式耳機 WH-1000XM4', 1200, '95新，有盒有單，功能完全正常。', '電子產品', '沙田', 'demo-images/headphones.svg', 22.37710000, 114.19740000);
