@@ -1,0 +1,55 @@
+.profile {
+  padding: 24px 0 8px;
+  text-align: center;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.name {
+  margin: 0 0 4px;
+  color: #1f2621;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.slogan {
+  margin: 0;
+  color: #7d8c81;
+  font-size: 13px;
+}
+
+.stat-card {
+  margin: 20px 0;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  margin: 0;
+  color: var(--ion-color-primary);
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.stat-label {
+  margin: 4px 0 0;
+  color: #7d8c81;
+  font-size: 13px;
+}
+
+.about {
+  border-radius: 12px;
+  overflow: hidden;
+}

@@ -1,21 +1,79 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> Blank </ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>ReMarket</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar color="primary">
+    <ion-searchbar
+      [debounce]="200"
+      placeholder="搜尋商品，例如：單車、書枱"
+      showClearButton="always"
+      (ionInput)="onSearch($event)"
+    ></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="loadProducts($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>
-      Start with Ionic
-      <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a>
-    </p>
-  </div>
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <!-- 載入中：顯示骨架卡片 -->
+      @if (isLoading) {
+        @for (i of [1, 2, 3, 4]; track i) {
+          <ion-col size="6" class="card-col">
+            <ion-card class="product-card">
+              <div class="thumb">
+                <ion-skeleton-text [animated]="true" class="thumb-skeleton"></ion-skeleton-text>
+              </div>
+              <ion-card-content class="card-body">
+                <ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text>
+                <ion-skeleton-text [animated]="true" style="width: 90%"></ion-skeleton-text>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        }
+      }
+
+      <!-- 商品卡片 -->
+      @for (item of filteredProducts; track item.id) {
+        <ion-col size="6" class="card-col">
+          <ion-card class="product-card" [routerLink]="['/product', item.id]">
+            <div class="thumb">
+              @if (item.image) {
+                <ion-img [src]="imageUrl(item.image)" [alt]="item.title"></ion-img>
+              } @else {
+                <div class="thumb-placeholder">暫無圖片</div>
+              }
+            </div>
+
+            <ion-card-content class="card-body">
+              <p class="price">HK$ {{ item.price }}</p>
+              <p class="title">{{ item.title }}</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+
+  <!-- 狀態提示 -->
+  @if (!isLoading && hasError) {
+    <div class="empty-state">
+      <p>無法連線到伺服器</p>
+      <p class="hint">請確認 XAMPP 的 Apache 和 MySQL 已啟動</p>
+    </div>
+  } @else if (!isLoading && products.length === 0) {
+    <div class="empty-state">
+      <p>目前沒有商品</p>
+      <p class="hint">成為第一個刊登的人吧！</p>
+    </div>
+  } @else if (!isLoading && filteredProducts.length === 0) {
+    <div class="empty-state">
+      <p>找不到「{{ searchText }}」的相關商品</p>
+      <p class="hint">試試其他關鍵字</p>
+    </div>
+  }
 </ion-content>

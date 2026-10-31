@@ -1,0 +1,29 @@
+-- ReMarket 資料庫結構與測試資料
+-- 用法（二選一）：
+--   1. phpMyAdmin → 匯入 → 選這個檔案 → 執行
+--   2. 命令列：mysql -u root < carousell_db.sql
+-- 注意：會先刪除舊的 products 表，重新建立並寫入三筆示範商品。
+
+CREATE DATABASE IF NOT EXISTS carousell_db
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+
+USE carousell_db;
+
+DROP TABLE IF EXISTS products;
+
+CREATE TABLE products (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  title VARCHAR(100) NOT NULL,
+  price INT(11) NOT NULL,
+  description TEXT NOT NULL,
+  image VARCHAR(255) NOT NULL,
+  lat DECIMAL(10, 8) NOT NULL,
+  lng DECIMAL(11, 8) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+INSERT INTO products (title, price, description, image, lat, lng) VALUES
+('復古單車 26吋 7成新', 850, '買咗兩年，少踩，鏈條新換，附車鎖。旺角自取。', 'https://picsum.photos/seed/bike/600/600', 22.31930000, 114.16940000),
+('IKEA 書枱 白色', 300, '120x60cm，有少許使用痕跡，需自行搬運。', 'https://picsum.photos/seed/desk/600/600', 22.28190000, 114.15820000),
+('Sony 頭戴式耳機 WH-1000XM4', 1200, '95新，有盒有單，功能完全正常。', 'https://picsum.photos/seed/headphone/600/600', 22.37710000, 114.19740000);

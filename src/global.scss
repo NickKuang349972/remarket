@@ -34,4 +34,16 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* 深色模式已停用：App 統一使用綠色 + 白色淺色主題，避免系統深色模式令文字看不清 */
+// @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* 地圖標記（Leaflet divIcon 產生的節點在元件外，所以寫在全域） */
+.remarket-pin span {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
+}

@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>我的</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="profile">
+    <div class="avatar">R</div>
+    <h2 class="name">ReMarket 用戶</h2>
+    <p class="slogan">二手物品，找到新主人</p>
+  </div>
+
+  <ion-card class="stat-card">
+    <ion-card-content>
+      <p class="stat-value">{{ productCount }}</p>
+      <p class="stat-label">件商品正在發售</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list lines="full" class="about">
+    <ion-item>
+      <ion-label>
+        <h3>關於 ReMarket</h3>
+        <p>以 Ionic + Angular 製作的二手買賣平台</p>
+      </ion-label>
+      <ion-note slot="end">v1.0</ion-note>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        <h3>技術架構</h3>
+        <p>Ionic / Angular / Leaflet / PHP / MySQL</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

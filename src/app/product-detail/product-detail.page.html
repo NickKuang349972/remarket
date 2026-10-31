@@ -1,0 +1,48 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text="返回"></ion-back-button>
+    </ion-buttons>
+    <ion-title>商品詳情</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (isLoading) {
+    <div class="photo">
+      <ion-skeleton-text [animated]="true" class="photo-skeleton"></ion-skeleton-text>
+    </div>
+    <div class="body">
+      <ion-skeleton-text [animated]="true" style="width: 40%"></ion-skeleton-text>
+      <ion-skeleton-text [animated]="true" style="width: 80%"></ion-skeleton-text>
+      <ion-skeleton-text [animated]="true" style="width: 100%"></ion-skeleton-text>
+    </div>
+  } @else if (notFound) {
+    <div class="empty-state">
+      <p>找不到這件商品</p>
+      <p class="hint">它可能已經被賣家下架了</p>
+    </div>
+  } @else if (product) {
+    <div class="photo">
+      @if (product.image) {
+        <ion-img [src]="imageUrl(product.image)" [alt]="product.title"></ion-img>
+      } @else {
+        <div class="photo-placeholder">暫無圖片</div>
+      }
+    </div>
+
+    <div class="body">
+      <p class="price">HK$ {{ product.price }}</p>
+      <h2 class="title">{{ product.title }}</h2>
+
+      @if (product.lat && product.lng) {
+        <p class="location">📍 地圖位置 {{ product.lat }}, {{ product.lng }}</p>
+      }
+
+      <div class="section">
+        <h3>商品說明</h3>
+        <p class="description">{{ product.description || '賣家沒有提供說明' }}</p>
+      </div>
+    </div>
+  }
+</ion-content>

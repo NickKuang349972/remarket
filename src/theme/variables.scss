@@ -1,2 +1,26 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// ReMarket 主題色：綠色 + 白色
+// Ionic 的主題變數都在這裡改，所有 ion-* 元件會自動跟著變。
+
+:root {
+  /* 主色：ReMarket 綠 */
+  --ion-color-primary: #2f9e44;
+  --ion-color-primary-rgb: 47, 158, 68;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #298b3c;
+  --ion-color-primary-tint: #44a857;
+
+  /* 背景與文字（淺色底、深色字，確保看得清楚） */
+  --ion-background-color: #f6faf7;
+  --ion-background-color-rgb: 246, 250, 247;
+  --ion-text-color: #1f2621;
+  --ion-text-color-rgb: 31, 38, 33;
+
+  /* 卡片與列表一律白底 */
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+
+  /* 工具列用綠色配白字 */
+  --ion-toolbar-background: var(--ion-color-primary);
+  --ion-toolbar-color: #ffffff;
+}

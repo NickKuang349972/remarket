@@ -1,5 +1,5 @@
 {
-  "name": "carousell-app",
+  "name": "remarket-app",
   "version": "0.0.1",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
@@ -31,8 +31,10 @@
     "@capacitor/haptics": "8.0.2",
     "@capacitor/keyboard": "8.0.6",
     "@capacitor/status-bar": "8.0.4",
-    "@ionic/angular": "^9.0.0",
+    "@ionic/angular": "^9.0.10",
+    "@types/leaflet": "^1.9.22",
     "ionicons": "^8.1.0",
+    "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -56,5 +58,5 @@
     "vitest": "~5.0.5"
   },
   "prettier": "@ionic/prettier-config",
-  "description": "An Ionic project"
+  "description": "ReMarket – 二手物品買賣平台 (Ionic + Angular + PHP + MySQL)"
 }

@@ -1,0 +1,75 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>刊登商品</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <label class="photo-picker">
+    @if (imagePreview) {
+      <img [src]="imagePreview" alt="商品相片預覽" />
+    } @else {
+      <span>點擊加入商品相片</span>
+    }
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+  </label>
+
+  <ion-item lines="none" class="field">
+    <ion-input
+      label="商品標題"
+      labelPlacement="stacked"
+      placeholder="例如：IKEA 書枱 白色"
+      [(ngModel)]="title"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item lines="none" class="field">
+    <ion-input
+      label="價格 (HK$)"
+      labelPlacement="stacked"
+      type="number"
+      inputmode="decimal"
+      placeholder="例如：300"
+      [(ngModel)]="priceText"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item lines="none" class="field">
+    <ion-textarea
+      label="商品說明"
+      labelPlacement="stacked"
+      placeholder="新舊程度、尺寸、交收方式…"
+      [autoGrow]="true"
+      [rows]="4"
+      [(ngModel)]="description"
+    ></ion-textarea>
+  </ion-item>
+
+  <div class="location">
+    <ion-button fill="outline" size="small" [disabled]="isLocating" (click)="useCurrentLocation()">
+      @if (isLocating) {
+        <ion-spinner name="dots"></ion-spinner>
+      } @else {
+        使用目前位置
+      }
+    </ion-button>
+
+    @if (lat !== null && lng !== null) {
+      <span class="coords">已定位：{{ lat }}, {{ lng }}</span>
+    } @else {
+      <span class="coords muted">未定位，預設使用旺角</span>
+    }
+  </div>
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  <ion-button expand="block" class="submit" [disabled]="isSubmitting" (click)="submit()">
+    @if (isSubmitting) {
+      <ion-spinner name="dots"></ion-spinner>
+    } @else {
+      立即刊登
+    }
+  </ion-button>
+</ion-content>

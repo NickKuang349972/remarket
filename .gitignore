@@ -74,3 +74,11 @@ Thumbs.db
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# 後端上傳的相片（保留資料夾本身）
+/backend/uploads/*
+!/backend/uploads/.gitkeep
+
+# 本機暫存／工具用資料夾
+/.pylibs
+/.tmp
