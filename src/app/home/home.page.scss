@@ -1,7 +1,10 @@
 ion-searchbar {
-  --background: #ffffff;
-  --border-radius: 10px;
+  --background: #f3f4f6;
+  --border-radius: 20px;
   --box-shadow: none;
+  --color: #1f2937;
+  --placeholder-color: #9ca3af;
+  --icon-color: #9ca3af;
   padding-inline: 8px;
   padding-bottom: 6px;
 }
@@ -34,8 +37,9 @@ ion-searchbar {
   font-size: 13px;
 
   &.active {
-    --background: var(--ion-color-primary);
-    color: #ffffff;
+    --background: #eaf5ec;
+    color: var(--ion-color-primary);
+    font-weight: 600;
   }
 }
 
@@ -54,9 +58,26 @@ ion-grid {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   cursor: pointer;
+
+  /* 已售出：整張卡片置灰，價格／標題也變淡 */
+  &.is-sold {
+    background: #f6f6f6;
+
+    .thumb img,
+    .thumb ion-img {
+      filter: grayscale(1);
+      opacity: 0.85;
+    }
+
+    .price,
+    .title,
+    .addr {
+      color: #9a9a9a;
+    }
+  }
 }
 
 .thumb {
@@ -88,11 +109,43 @@ ion-grid {
   font-size: 12px;
 }
 
+/* 已售出遮罩：對角斜紋 + 半透明黑底，點擊仍可進入詳情 */
+.sold-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(17, 24, 39, 0.55) 0,
+    rgba(17, 24, 39, 0.55) 10px,
+    rgba(17, 24, 39, 0.3) 10px,
+    rgba(17, 24, 39, 0.3) 20px
+  );
+  pointer-events: none;
+}
+
+.sold-badge {
+  padding: 6px 14px;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  background: rgba(17, 24, 39, 0.85);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  transform: rotate(-8deg);
+}
+
 /* 愛心按鈕浮在圖片右上角 */
 .fav {
   position: absolute;
   top: 4px;
   right: 4px;
+  z-index: 2;
   --padding-start: 6px;
   --padding-end: 6px;
   --background: rgba(255, 255, 255, 0.85);
@@ -117,18 +170,18 @@ ion-grid {
 
 .price {
   margin: 0 0 2px;
-  font-size: 15px;
+  color: #1f2937;
+  font-size: 16px;
   font-weight: 700;
-  color: #111;
 }
 
 .title {
   display: -webkit-box;
   margin: 0;
   overflow: hidden;
-  color: #4a4a4a;
+  color: #4b5563;
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.4;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }

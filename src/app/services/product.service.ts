@@ -18,6 +18,7 @@ export interface Product {
   address?: string;
   lat?: number;
   lng?: number;
+  status?: string;
 }
 
 /** 刊登新商品時需要的資料 */
@@ -30,6 +31,7 @@ export interface AddProductInput {
   image?: File | null;
   lat: number;
   lng: number;
+  status?: string;
 }
 
 /** 後端統一回傳格式：{ status: 'success' | 'error', data?, message?, id? } */
@@ -93,6 +95,10 @@ export class ProductService {
     form.append('lat', String(input.lat));
     form.append('lng', String(input.lng));
 
+    if (input.status) {
+      form.append('status', input.status);
+    }
+
     if (input.image) {
       form.append('image', input.image);
     }
@@ -119,6 +125,10 @@ export class ProductService {
     form.append('address', input.address);
     form.append('lat', String(input.lat));
     form.append('lng', String(input.lng));
+
+    if (input.status) {
+      form.append('status', input.status);
+    }
 
     if (input.image) {
       form.append('image', input.image);

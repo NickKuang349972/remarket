@@ -24,7 +24,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" [class.has-buyer-bar]="showBuyerBar">
   @if (isLoading) {
     <div class="photo">
       <ion-skeleton-text [animated]="true" class="photo-skeleton"></ion-skeleton-text>
@@ -42,14 +42,30 @@
   } @else if (product) {
     <div class="photo">
       @if (product.image) {
-        <img class="hero" [src]="imageUrl(product.image)" [alt]="product.title" />
+        <img
+          class="hero"
+          [class.is-sold]="isSold"
+          [src]="imageUrl(product.image)"
+          [alt]="product.title"
+        />
       } @else {
         <div class="photo-placeholder">暫無圖片</div>
+      }
+
+      @if (isSold) {
+        <div class="sold-overlay">
+          <span class="sold-badge">已售出</span>
+        </div>
       }
     </div>
 
     <div class="body">
-      <p class="price">HK$ {{ product.price }}</p>
+      <div class="price-row">
+        <p class="price">HK$ {{ product.price }}</p>
+        <span class="status-badge" [class.is-sold]="isSold">
+          {{ isSold ? '已售出' : '在售' }}
+        </span>
+      </div>
       <h2 class="title">{{ product.title }}</h2>
 
       @if (product.category) {
@@ -74,6 +90,24 @@
             編輯
           </ion-button>
 
+          <ion-button
+            fill="outline"
+            size="small"
+            [color]="isSold ? 'success' : 'medium'"
+            [disabled]="isUpdatingStatus"
+            (click)="toggleSold()"
+          >
+            @if (isUpdatingStatus) {
+              <ion-spinner slot="start" name="dots"></ion-spinner>
+            } @else {
+              <ion-icon
+                slot="start"
+                [name]="isSold ? 'refresh-outline' : 'checkmark-circle-outline'"
+              ></ion-icon>
+            }
+            {{ isSold ? '重新上架' : '標記為已售出' }}
+          </ion-button>
+
           <ion-button fill="outline" size="small" color="danger" (click)="confirmDelete()">
             <ion-icon slot="start" name="trash-outline"></ion-icon>
             刪除
@@ -83,6 +117,21 @@
     </div>
   }
 </ion-content>
+
+<!-- 買家交易操作欄：非本人商品且仍在售時才顯示 -->
+@if (showBuyerBar) {
+  <div class="buyer-action-bar">
+    <ion-button class="offer-btn" fill="outline" expand="block" (click)="makeOffer()">
+      <ion-icon slot="start" name="pricetag-outline"></ion-icon>
+      出價
+    </ion-button>
+
+    <ion-button class="contact-btn" expand="block" (click)="contactSeller()">
+      <ion-icon slot="start" name="chatbubble-ellipses-outline"></ion-icon>
+      聯絡賣家
+    </ion-button>
+  </div>
+}
 
 <ion-modal [isOpen]="isEditOpen" (didDismiss)="closeEdit()">
   <ng-template>

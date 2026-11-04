@@ -74,12 +74,22 @@
       <!-- 商品卡片 -->
       @for (item of filteredProducts; track item.id) {
         <ion-col size="6" class="card-col">
-          <ion-card class="product-card" [routerLink]="['/product', item.id]">
+          <ion-card
+            class="product-card"
+            [class.is-sold]="item.status === 'sold'"
+            [routerLink]="['/product', item.id]"
+          >
             <div class="thumb">
               @if (item.image) {
                 <ion-img [src]="imageUrl(item.image)" [alt]="item.title"></ion-img>
               } @else {
                 <div class="thumb-placeholder">暫無圖片</div>
+              }
+
+              @if (item.status === 'sold') {
+                <div class="sold-overlay">
+                  <span class="sold-badge">已售出</span>
+                </div>
               }
 
               <ion-button

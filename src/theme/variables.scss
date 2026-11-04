@@ -10,13 +10,13 @@
   --ion-color-primary-shade: #298b3c;
   --ion-color-primary-tint: #44a857;
 
-  /* 背景與文字（淺色底、深色字，確保看得清楚） */
-  --ion-background-color: #f6faf7;
-  --ion-background-color-rgb: 246, 250, 247;
+  /* 背景與文字：極淺灰綠底，避免純白刺眼 */
+  --ion-background-color: #f8faf9;
+  --ion-background-color-rgb: 248, 250, 249;
   --ion-text-color: #1f2621;
   --ion-text-color-rgb: 31, 38, 33;
 
-  /* 卡片與列表一律白底 */
+  /* 卡片與列表一律純白，和灰綠底形成層次 */
   --ion-card-background: #ffffff;
   --ion-item-background: #ffffff;
 

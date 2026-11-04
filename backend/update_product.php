@@ -29,6 +29,11 @@ $address = trim($_POST['address'] ?? '');
 $lat = $_POST['lat'] ?? '';
 $lng = $_POST['lng'] ?? '';
 
+$status = strtolower(trim($_POST['status'] ?? ''));
+if ($status !== '' && !in_array($status, ['available', 'sold'], true)) {
+    respond('error', '商品狀態不正確');
+}
+
 if (!is_numeric($id)) {
     respond('error', '缺少商品編號');
 }
@@ -104,6 +109,11 @@ try {
         ':id'          => $id,
     ];
 
+    if ($status !== '') {
+        $sql .= ", status = :status";
+        $params[':status'] = $status;
+    }
+
     if ($newImagePath !== null) {
         $sql .= ", image = :image";
         $params[':image'] = $newImagePath;
@@ -114,7 +124,6 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
-    // 換了新相片就把舊檔案刪掉（只刪 uploads 內的檔案）
     if ($newImagePath !== null && !empty($existing['image']) && str_starts_with($existing['image'], 'uploads/')) {
         $oldFile = __DIR__ . '/' . $existing['image'];
         if (is_file($oldFile)) {

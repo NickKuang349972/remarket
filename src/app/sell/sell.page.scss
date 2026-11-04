@@ -7,12 +7,20 @@
   aspect-ratio: 4 / 3;
   margin-bottom: 14px;
   overflow: hidden;
-  border: 2px dashed #cfe0d3;
+  border: 2px dashed #cbd5e1;
   border-radius: 12px;
-  background: #ffffff;
+  background: #f8fafc;
   color: #8aa38f;
   font-size: 14px;
   cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--ion-color-primary);
+    background: #f3faf5;
+  }
 
   img {
     width: 100%;

@@ -27,6 +27,11 @@ $category = trim($_POST['category'] ?? '其他');
 $address = trim($_POST['address'] ?? '');
 $lat = $_POST['lat'] ?? '';
 $lng = $_POST['lng'] ?? '';
+// 商品狀態：available（在售）/ sold（已售出），不帶或亂填一律當作在售
+$status = strtolower(trim($_POST['status'] ?? 'available'));
+if (!in_array($status, ['available', 'sold'], true)) {
+    $status = 'available';
+}
 
 if ($title === '') {
     respond('error', '商品標題不能為空');
@@ -78,8 +83,8 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $stmt = $pdo->prepare(
-        "INSERT INTO products (title, price, description, category, address, image, lat, lng)
-         VALUES (:title, :price, :description, :category, :address, :image, :lat, :lng)"
+        "INSERT INTO products (title, price, description, category, address, image, lat, lng, status)
+         VALUES (:title, :price, :description, :category, :address, :image, :lat, :lng, :status)"
     );
 
     $stmt->execute([
@@ -91,6 +96,7 @@ try {
         ':image'       => $imagePath,
         ':lat'         => $lat,
         ':lng'         => $lng,
+        ':status'      => $status,
     ]);
 
     respond('success', '商品刊登成功', ['id' => (int) $pdo->lastInsertId()]);
