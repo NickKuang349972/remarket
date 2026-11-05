@@ -3,6 +3,11 @@
 以 **Ionic 9 + Angular 22** 製作的跨平台二手買賣 App，後端使用 **PHP + MySQL**（XAMPP）。
 介面為「暖調二手雜誌」風格：奶油紙底、深咖啡文字、磚紅只給選中態與主要操作，卡片採無框扁平排版。
 
+## 组员信息
+- [Chau Chi Chung] 
+- [Lin Siu Wai]
+- [Kuang Tsz Hei]
+
 ## 功能
 
 | 頁面 | 功能 |
