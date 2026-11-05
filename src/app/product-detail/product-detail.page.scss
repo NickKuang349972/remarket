@@ -1,9 +1,13 @@
+ion-content {
+  --background: var(--rm-surface);
+}
+
 .photo {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: #f2f2f2;
   overflow: hidden;
+  background: var(--rm-paper-deep);
 
   .hero {
     display: block;
@@ -19,27 +23,29 @@
   }
 }
 
-/* 已售出時蓋在圖片上的遮罩與標籤 */
+/* 已售出遮罩與目錄印章 */
 .sold-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgb(38 53 44 / 45%);
   pointer-events: none;
 }
 
 .sold-badge {
-  padding: 6px 16px;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #ffffff;
+  padding: 8px 18px;
+  border: 1px solid var(--rm-paper);
+  border-radius: 3px;
+  background: rgb(33 31 26 / 78%);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 22%);
+  color: var(--rm-paper);
+  font-family: var(--rm-display-font);
   font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  transform: rotate(-8deg);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  transform: rotate(-6deg);
 }
 
 .photo-skeleton {
@@ -52,118 +58,145 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #9e9e9e;
+  color: var(--rm-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
 }
 
+/* 內容像一張紙卡浮在圖片上 */
 .body {
-  padding: 16px;
-  background: #ffffff;
+  position: relative;
+  margin-top: -18px;
+  padding: 24px 20px 30px;
+  border-radius: 16px 16px 0 0;
+  background: var(--rm-surface);
 }
 
 .price-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .price {
   margin: 0;
-  color: #111;
-  font-size: 24px;
+  color: var(--rm-ink);
+  font-family: var(--ion-font-family);
+  font-size: 28px;
   font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
 }
 
-/* 在售／已售出狀態標籤 */
+/* 在售／已售出狀態：細線標籤 */
 .status-badge {
-  padding: 2px 10px;
+  padding: 3px 10px;
+  border: 1px solid rgb(38 53 44 / 22%);
   border-radius: 999px;
-  background: #eaf5ec;
-  color: var(--ion-color-primary);
-  font-size: 12px;
+  background: rgb(38 53 44 / 6%);
+  color: var(--rm-forest-soft);
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0.06em;
   white-space: nowrap;
 
   &.is-sold {
-    background: #eeeeee;
-    color: #777777;
+    border-color: var(--rm-line);
+    background: var(--rm-paper-deep);
+    color: var(--rm-muted);
   }
 }
 
 .title {
-  margin: 0 0 8px;
-  color: #222;
-  font-size: 17px;
+  margin: 0 0 10px;
+  color: var(--rm-ink);
+  font-size: 19px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+/* 分類與位置收成一行，減少零散層級 */
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
 }
 
 .location {
-  margin: 0 0 16px;
-  color: #666;
-  font-size: 13px;
+  margin: 0;
+  color: var(--rm-muted);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
 }
 
 .category {
   display: inline-block;
-  margin: 0 0 12px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: #eaf5ec;
-  color: var(--ion-color-primary);
-  font-size: 12px;
+  margin: 0;
+  padding: 3px 9px;
+  border: 1px solid var(--rm-line);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--rm-muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
 }
 
 .section {
-  padding-top: 14px;
-  border-top: 1px solid #eeeeee;
+  padding-top: 16px;
+  border-top: 1px solid var(--rm-line);
 
   h3 {
-    margin: 0 0 6px;
-    color: #222;
-    font-size: 14px;
+    margin: 0 0 8px;
+    color: var(--rm-muted);
+    font-family: var(--rm-display-font);
+    font-size: 11px;
     font-weight: 600;
+    letter-spacing: 0.16em;
   }
 }
 
 .description {
   margin: 0;
-  color: #555;
+  color: var(--rm-ink-soft);
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.8;
   white-space: pre-wrap;
 }
 
 .empty-state {
   padding: 64px 24px;
+  color: var(--rm-ink-soft);
   text-align: center;
-  color: #666;
 }
 
 .hint {
-  color: #9e9e9e;
+  color: var(--rm-muted);
   font-size: 13px;
 }
 
-/* 賣家自己的操作（編輯／刪除） */
+/* 賣家自己的操作（編輯／標記售出／刪除） */
 .owner-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 20px;
 }
 
 /* 編輯 modal 內的輸入框 */
 .field {
-  --background: #ffffff;
-  --border-radius: 10px;
+  --background: var(--rm-surface);
+  border: 1px solid var(--rm-line);
+  border-radius: 4px;
   margin-bottom: 10px;
-  border-radius: 10px;
 }
 
 .error {
   margin: 8px 0 0;
-  color: #c0392b;
+  color: var(--rm-accent);
   font-size: 13px;
 }
 
@@ -182,17 +215,22 @@ ion-content.has-buyer-bar {
   gap: 12px;
   width: 100%;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid #eeeeee;
-  background: #ffffff;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid var(--rm-line);
+  background: var(--rm-surface);
+  box-shadow: 0 -10px 30px rgb(33 31 26 / 5%);
 
   ion-button {
     flex: 1;
     margin: 0;
-    --border-radius: 10px;
+    --border-radius: 4px;
+  }
+
+  .offer-btn {
+    --border-color: var(--rm-ink);
+    --color: var(--rm-ink);
   }
 
   .contact-btn {
-    --box-shadow: 0 4px 12px rgba(61, 83, 66, 0.25);
+    --box-shadow: 0 8px 18px rgb(169 80 47 / 22%);
   }
 }

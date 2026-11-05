@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" text="返回"></ion-back-button>
     </ion-buttons>
@@ -12,7 +12,7 @@
           <ion-icon
             slot="icon-only"
             [name]="isFavorite ? 'heart' : 'heart-outline'"
-            [style.color]="isFavorite ? '#ff8fab' : '#ffffff'"
+            [style.color]="isFavorite ? '#d9a07f' : '#f3ede1'"
           ></ion-icon>
         </ion-button>
 
@@ -68,15 +68,17 @@
       </div>
       <h2 class="title">{{ product.title }}</h2>
 
-      @if (product.category) {
-        <p class="category">{{ product.category }}</p>
-      }
+      <div class="meta-row">
+        @if (product.category) {
+          <span class="category">{{ product.category }}</span>
+        }
 
-      @if (product.address) {
-        <p class="location">📍 {{ product.address }}</p>
-      } @else if (product.lat && product.lng) {
-        <p class="location">📍 {{ product.lat }}, {{ product.lng }}</p>
-      }
+        @if (product.address) {
+          <span class="location">📍 {{ product.address }}</span>
+        } @else if (product.lat && product.lng) {
+          <span class="location">📍 已標記位置</span>
+        }
+      </div>
 
       <div class="section">
         <h3>商品說明</h3>
@@ -85,7 +87,7 @@
 
       @if (isMine) {
         <div class="owner-actions">
-          <ion-button fill="outline" size="small" (click)="openEdit()">
+          <ion-button fill="solid" size="small" (click)="openEdit()">
             <ion-icon slot="start" name="create-outline"></ion-icon>
             編輯
           </ion-button>
@@ -93,7 +95,7 @@
           <ion-button
             fill="outline"
             size="small"
-            [color]="isSold ? 'success' : 'medium'"
+            color="secondary"
             [disabled]="isUpdatingStatus"
             (click)="toggleSold()"
           >
@@ -108,7 +110,7 @@
             {{ isSold ? '重新上架' : '標記為已售出' }}
           </ion-button>
 
-          <ion-button fill="outline" size="small" color="danger" (click)="confirmDelete()">
+          <ion-button fill="clear" size="small" color="danger" (click)="confirmDelete()">
             <ion-icon slot="start" name="trash-outline"></ion-icon>
             刪除
           </ion-button>
@@ -136,7 +138,7 @@
 <ion-modal [isOpen]="isEditOpen" (didDismiss)="closeEdit()">
   <ng-template>
     <ion-header>
-      <ion-toolbar color="primary">
+      <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button (click)="closeEdit()">取消</ion-button>
         </ion-buttons>

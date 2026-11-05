@@ -1,78 +1,89 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-title>我的</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="profile">
+<ion-content [fullscreen]="true">
+  <div class="profile-hero">
     <div class="avatar">R</div>
     <h2 class="name">ReMarket 用戶</h2>
     <p class="slogan">二手物品，找到新主人</p>
   </div>
 
-  <ion-grid class="ion-no-padding stats">
-    <ion-row>
-      <ion-col size="6">
-        <ion-card class="stat-card">
-          <ion-card-content>
-            <p class="stat-value">{{ myProducts.length }}</p>
-            <p class="stat-label">我的刊登</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6">
-        <ion-card class="stat-card">
-          <ion-card-content>
-            <p class="stat-value">{{ favoriteProducts.length }}</p>
-            <p class="stat-label">我的收藏</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div class="content-wrap">
+    <ion-grid class="ion-no-padding stats">
+      <ion-row>
+        <ion-col size="6">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <p class="stat-value">{{ myProducts.length }}</p>
+              <p class="stat-label">我的刊登</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <p class="stat-value">{{ favoriteProducts.length }}</p>
+              <p class="stat-label">我的收藏</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
-  <h3 class="section-title">我的刊登</h3>
-  @if (myProducts.length > 0) {
-    <ion-list lines="none" class="item-list">
-      @for (item of myProducts; track item.id) {
-        <ion-item [routerLink]="['/product', item.id]" detail="true">
-          <ion-img class="thumb" [src]="imageUrl(item.image)" [alt]="item.title"></ion-img>
-          <ion-label>
-            <h2>{{ item.title }}</h2>
-            <p>HK$ {{ item.price }}</p>
-          </ion-label>
-        </ion-item>
-      }
+    <h3 class="section-title">我的刊登</h3>
+    @if (myProducts.length > 0) {
+      <ion-list lines="none" class="item-list">
+        @for (item of myProducts; track item.id) {
+          <ion-item [routerLink]="['/product', item.id]" detail="true">
+            <ion-img
+              class="thumb"
+              [class.is-sold]="item.status === 'sold'"
+              [src]="imageUrl(item.image)"
+              [alt]="item.title"
+            ></ion-img>
+            <ion-label>
+              <h2>{{ item.title }}</h2>
+              <p class="price">HK$ {{ item.price }}</p>
+            </ion-label>
+            <span slot="end" class="status-tag" [class.is-sold]="item.status === 'sold'">
+              {{ item.status === 'sold' ? '已售出' : '在售' }}
+            </span>
+          </ion-item>
+        }
+      </ion-list>
+    } @else {
+      <p class="empty">還沒有刊登過商品，去「刊登」頁試試吧。</p>
+    }
+
+    <h3 class="section-title">我的收藏</h3>
+    @if (favoriteProducts.length > 0) {
+      <ion-list lines="none" class="item-list">
+        @for (item of favoriteProducts; track item.id) {
+          <ion-item [routerLink]="['/product', item.id]" detail="true">
+            <ion-img class="thumb" [src]="imageUrl(item.image)" [alt]="item.title"></ion-img>
+            <ion-label>
+              <h2>{{ item.title }}</h2>
+              <p class="price">HK$ {{ item.price }}</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else {
+      <p class="empty">在商品卡片上按愛心，就會出現在這裡。</p>
+    }
+
+    <h3 class="section-title">關於</h3>
+    <ion-list lines="none" class="item-list about-list">
+      <ion-item>
+        <ion-label>
+          <h2>ReMarket</h2>
+          <p>Ionic / Angular / Leaflet / PHP / MySQL</p>
+        </ion-label>
+        <span slot="end" class="version">v1.0</span>
+      </ion-item>
     </ion-list>
-  } @else {
-    <p class="empty">還沒有刊登過商品，去「刊登」頁試試吧。</p>
-  }
-
-  <h3 class="section-title">我的收藏</h3>
-  @if (favoriteProducts.length > 0) {
-    <ion-list lines="none" class="item-list">
-      @for (item of favoriteProducts; track item.id) {
-        <ion-item [routerLink]="['/product', item.id]" detail="true">
-          <ion-img class="thumb" [src]="imageUrl(item.image)" [alt]="item.title"></ion-img>
-          <ion-label>
-            <h2>{{ item.title }}</h2>
-            <p>HK$ {{ item.price }}</p>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
-  } @else {
-    <p class="empty">在商品卡片上按愛心，就會出現在這裡。</p>
-  }
-
-  <h3 class="section-title">關於</h3>
-  <ion-list lines="full" class="item-list">
-    <ion-item>
-      <ion-label>
-        <h2>ReMarket</h2>
-        <p>Ionic / Angular / Leaflet / PHP / MySQL</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+  </div>
 </ion-content>

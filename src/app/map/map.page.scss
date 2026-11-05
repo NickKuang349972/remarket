@@ -1,5 +1,5 @@
 ion-content {
-  --background: #e8f0e9;
+  --background: var(--rm-paper-deep);
 }
 
 /* 地圖需要絕對定位才會填滿 ion-content */
