@@ -34,10 +34,8 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-/* 深色模式已停用：本 App 使用固定的紙張淺色主題，避免系統深色模式令文字看不清 */
 // @import '@ionic/angular/css/palettes/dark.system.css';
 
-/* ---- 全域視覺：紙張、墨綠、陶土 ---- */
 body {
   background: var(--rm-paper);
   color: var(--rm-ink);
@@ -73,12 +71,10 @@ ion-button {
   outline-offset: 2px;
 }
 
-/* 地圖瓦片：壓成奶油灰綠，避免預設亮色打斷整體氣質 */
 .leaflet-tile-pane {
   filter: grayscale(0.4) sepia(0.16) hue-rotate(58deg) saturate(0.65) brightness(1.03);
 }
 
-/* 地圖標記（Leaflet divIcon 產生的節點在元件外，所以寫在全域） */
 .remarket-pin span {
   display: block;
   width: 16px;
@@ -89,7 +85,6 @@ ion-button {
   box-shadow: 0 1px 4px rgb(33 31 26 / 35%);
 }
 
-/* 地圖上的「我的位置」藍點 */
 .me-pin span {
   display: block;
   width: 20px;

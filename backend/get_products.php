@@ -11,23 +11,34 @@ try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // 支援 ?category=電子產品 這種篩選（不帶就回傳全部）
     $category = trim($_GET['category'] ?? '');
 
     if ($category !== '') {
         $stmt = $pdo->prepare(
-            "SELECT id, title, price, description, category, address, image, lat, lng, status
+            "SELECT id, title, price, description, category, address, lat, lng, status,
+                    condition_label, delivery_method, is_negotiable
              FROM products WHERE category = :category ORDER BY id DESC"
         );
         $stmt->execute([':category' => $category]);
     } else {
         $stmt = $pdo->query(
-            "SELECT id, title, price, description, category, address, image, lat, lng, status
+            "SELECT id, title, price, description, category, address, lat, lng, status,
+                    condition_label, delivery_method, is_negotiable
              FROM products ORDER BY id DESC"
         );
     }
 
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($products as &$product) {
+        $imgStmt = $pdo->prepare("SELECT path FROM product_images WHERE product_id = :product_id");
+        $imgStmt->execute([':product_id' => $product['id']]);
+        $imagePaths = $imgStmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $product['images'] = $imagePaths;
+        $product['image'] = count($imagePaths) > 0 ? $imagePaths[0] : '';
+    }
+    unset($product);
 
     echo json_encode(["status" => "success", "data" => $products], JSON_UNESCAPED_UNICODE);
 

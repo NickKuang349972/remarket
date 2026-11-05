@@ -1,25 +1,65 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>刊登商品</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <div class="sell-head">
-    <h2>刊登二手好物</h2>
-    <p>填寫資料，讓買家更快找到它</p>
+  <div class="page-head">
+    <h1 class="page-title">刊登二手好物</h1>
+    <p class="page-sub">填寫資料，讓買家更快找到它</p>
   </div>
 
   <div class="content-wrap">
-    <label class="photo-picker">
-      @if (imagePreview) {
-        <img [src]="imagePreview" alt="商品相片預覽" />
-      } @else {
-        <span class="picker-label">點擊加入商品相片</span>
-        <span class="picker-hint">支援 JPG / PNG，最大 5MB</span>
+    <div class="photo-section">
+      <div class="photo-grid">
+        @for (preview of imagePreviews; track preview; let i = $index) {
+          <div class="photo-tile">
+            <img [src]="preview" [alt]="'商品相片 ' + (i + 1)" />
+
+            @if (i === 0) {
+              <span class="cover-badge">封面</span>
+            }
+
+            <button
+              type="button"
+              class="remove-photo-btn"
+              aria-label="移除這張相片"
+              (click)="removeImage(i)"
+            >
+              <ion-icon name="close" aria-hidden="true"></ion-icon>
+            </button>
+          </div>
+        }
+
+        @if (!isPhotoFull) {
+          <label
+            class="photo-add-tile"
+            [class.is-empty]="imagePreviews.length === 0"
+          >
+            <span class="add-icon-wrap">
+              <ion-icon name="camera-outline" aria-hidden="true"></ion-icon>
+            </span>
+
+            @if (imagePreviews.length === 0) {
+              <span class="add-label">加入商品相片</span>
+              <span class="add-sub">第一張將作為商品封面</span>
+            } @else {
+              <span class="add-label">加入相片</span>
+            }
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="onFileSelected($event)"
+            />
+          </label>
+        }
+      </div>
+
+      @if (photoError) {
+        <p class="photo-error">{{ photoError }}</p>
       }
-      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-    </label>
+
+      <p class="picker-hint">
+        {{ imagePreviews.length }}/{{ MAX_PHOTOS }} · 支援 JPG / PNG / WEBP，每張最大 5MB
+      </p>
+    </div>
 
     <h3 class="form-title">商品資料</h3>
 
@@ -75,6 +115,38 @@
           placeholder="例如：旺角、沙田市中心"
           [(ngModel)]="addressText"
         ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="field">
+        <ion-select
+          label="商品狀況"
+          labelPlacement="stacked"
+          interface="popover"
+          [(ngModel)]="conditionLabel"
+        >
+          @for (option of conditionOptions; track option) {
+            <ion-select-option [value]="option">{{ option }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="none" class="field">
+        <ion-select
+          label="交易方式"
+          labelPlacement="stacked"
+          interface="popover"
+          [(ngModel)]="deliveryMethod"
+        >
+          @for (option of deliveryOptions; track option) {
+            <ion-select-option [value]="option">{{ option }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="none" class="field toggle-field">
+        <ion-toggle justify="space-between" [(ngModel)]="isNegotiable">
+          接受议价 (可小刀)
+        </ion-toggle>
       </ion-item>
 
       <div class="location">

@@ -4,55 +4,50 @@ import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 
-/** 一件二手商品（對應 MySQL 的 products 資料表） */
 export interface Product {
   id: number;
   title: string;
   price: number;
   description: string;
-  /** 圖片路徑，例如 http://localhost/remarket-backend/uploads/xxx.jpg */
   image?: string;
-  /** 商品分類，例如「電子產品」「傢俬」 */
+  images?: string[];
   category?: string;
-  /** 賣家填寫的地區名，例如「旺角」 */
   address?: string;
   lat?: number;
   lng?: number;
   status?: string;
+  condition_label?: string;
+  delivery_method?: string;
+  is_negotiable?: number | boolean | string;
 }
 
-/** 刊登新商品時需要的資料 */
 export interface AddProductInput {
   title: string;
   price: number;
   description: string;
   category: string;
   address: string;
-  image?: File | null;
+  images?: File[];
   lat: number;
   lng: number;
   status?: string;
+  condition_label?: string;
+  delivery_method?: string;
+  is_negotiable?: number | boolean;
 }
 
-/** 後端統一回傳格式：{ status: 'success' | 'error', data?, message?, id? } */
 interface ApiResponse<T> {
   status: 'success' | 'error';
   data?: T;
   message?: string;
-  /** add_product.php 成功時會回傳新商品的 id */
   id?: number;
 }
 
-/**
- * 所有商品相關的 API 呼叫都集中在這裡，
- * 頁面不需要知道自己打的是哪個 PHP 檔。
- */
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiBaseUrl;
 
-  /** 取得所有商品（新到舊） */
   async getProducts(): Promise<Product[]> {
     const response = await firstValueFrom(
       this.http.get<ApiResponse<Product[]>>(`${this.baseUrl}/get_products.php`),
@@ -65,17 +60,11 @@ export class ProductService {
     return response.data;
   }
 
-  /**
-   * 依 id 取得單一商品。
-   * 目前後端還未有單筆查詢 API，所以先抓全部再篩選；
-   * 之後加上 get_product.php 後只需改這個方法。
-   */
   async getProduct(id: number): Promise<Product | undefined> {
     const products = await this.getProducts();
     return products.find((product) => Number(product.id) === Number(id));
   }
 
-  /** 把資料庫存的相對路徑（uploads/xxx.jpg）轉成完整網址 */
   imageUrl(path?: string): string | undefined {
     if (!path) {
       return undefined;
@@ -84,7 +73,6 @@ export class ProductService {
     return path.startsWith('http') ? path : `${this.baseUrl}/${path}`;
   }
 
-  /** 新增商品：以 multipart/form-data 送出，可附帶一張相片；成功時回傳新商品 id */
   async addProduct(input: AddProductInput): Promise<number | undefined> {
     const form = new FormData();
     form.append('title', input.title);
@@ -99,8 +87,20 @@ export class ProductService {
       form.append('status', input.status);
     }
 
-    if (input.image) {
-      form.append('image', input.image);
+    if (input.condition_label) {
+      form.append('condition_label', input.condition_label);
+    }
+    if (input.delivery_method) {
+      form.append('delivery_method', input.delivery_method);
+    }
+    if (input.is_negotiable !== undefined) {
+      form.append('is_negotiable', input.is_negotiable ? '1' : '0');
+    }
+
+    if (input.images && input.images.length > 0) {
+      input.images.forEach((file) => {
+        form.append('image[]', file);
+      });
     }
 
     const response = await firstValueFrom(
@@ -114,7 +114,6 @@ export class ProductService {
     return response.id;
   }
 
-  /** 更新商品資料（可選擇換一張相片） */
   async updateProduct(id: number, input: AddProductInput): Promise<void> {
     const form = new FormData();
     form.append('id', String(id));
@@ -130,8 +129,20 @@ export class ProductService {
       form.append('status', input.status);
     }
 
-    if (input.image) {
-      form.append('image', input.image);
+    if (input.condition_label) {
+      form.append('condition_label', input.condition_label);
+    }
+    if (input.delivery_method) {
+      form.append('delivery_method', input.delivery_method);
+    }
+    if (input.is_negotiable !== undefined) {
+      form.append('is_negotiable', input.is_negotiable ? '1' : '0');
+    }
+
+    if (input.images && input.images.length > 0) {
+      input.images.forEach((file) => {
+        form.append('image[]', file);
+      });
     }
 
     const response = await firstValueFrom(
@@ -143,7 +154,6 @@ export class ProductService {
     }
   }
 
-  /** 刪除商品 */
   async deleteProduct(id: number): Promise<void> {
     const form = new FormData();
     form.append('id', String(id));

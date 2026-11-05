@@ -1,13 +1,52 @@
 ion-content {
-  --background: var(--rm-surface);
+  --background: var(--rm-paper);
 }
 
-.photo {
+ion-toolbar {
+  --background: var(--rm-paper);
+  --color: var(--rm-ink);
+  --ion-toolbar-color: var(--rm-ink);
+  --border-width: 0;
+  box-shadow: none;
+}
+
+ion-back-button {
+  --color: var(--rm-ink);
+}
+
+/* 全域的 ion-back-button 帶奶油 color（配深色工具列用），頁內直接覆寫 color 屬性 */
+.pd-header ion-back-button {
+  --color: var(--rm-ink);
+  color: var(--rm-ink);
+}
+
+/* 內縮圓角大圖：像一張放在奶油紙上的照片卡 */
+.photo-container {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  margin: 4px 20px 0;
+  border-radius: 16px;
   overflow: hidden;
   background: var(--rm-paper-deep);
+}
+
+.photo-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.photo-item {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
 
   .hero {
     display: block;
@@ -15,30 +54,46 @@ ion-content {
     height: 100%;
     object-fit: cover;
 
-    /* 已售出的商品圖片去色 */
     &.is-sold {
       filter: grayscale(1);
-      opacity: 0.9;
+      opacity: 0.88;
     }
   }
 }
 
-/* 已售出遮罩與目錄印章 */
+.photo-container > .hero {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+
+  &.is-sold {
+    filter: grayscale(1);
+    opacity: 0.88;
+  }
+}
+
 .sold-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(38 53 44 / 45%);
+  background: repeating-linear-gradient(
+    -45deg,
+    rgb(44 30 21 / 42%) 0,
+    rgb(44 30 21 / 42%) 10px,
+    rgb(44 30 21 / 20%) 10px,
+    rgb(44 30 21 / 20%) 20px
+  );
   pointer-events: none;
 }
 
 .sold-badge {
   padding: 8px 18px;
-  border: 1px solid var(--rm-paper);
+  border: 1px solid rgb(245 239 227 / 85%);
   border-radius: 3px;
-  background: rgb(33 31 26 / 78%);
+  background: rgb(44 30 21 / 78%);
   box-shadow: 0 8px 24px rgb(0 0 0 / 22%);
   color: var(--rm-paper);
   font-family: var(--rm-display-font);
@@ -63,106 +118,123 @@ ion-content {
   letter-spacing: 0.04em;
 }
 
-/* 內容像一張紙卡浮在圖片上 */
+/* 內容直接流在奶油紙上：襯線大標題 → 次要行 → 粗價格 → 白膠囊 → 列表 */
 .body {
-  position: relative;
-  margin-top: -18px;
-  padding: 24px 20px 30px;
-  border-radius: 16px 16px 0 0;
-  background: var(--rm-surface);
+  padding: 18px 24px 30px;
+}
+
+.pd-title {
+  margin: 0;
+  color: var(--rm-ink);
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.pd-meta {
+  margin: 7px 0 0;
+  color: var(--rm-muted);
+  font-size: 14px;
+  letter-spacing: 0.01em;
 }
 
 .price-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 18px;
 }
 
-.price {
+.pd-price {
   margin: 0;
   color: var(--rm-ink);
-  font-family: var(--ion-font-family);
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
 }
 
-/* 在售／已售出狀態：細線標籤 */
-.status-badge {
-  padding: 3px 10px;
-  border: 1px solid rgb(38 53 44 / 22%);
-  border-radius: 999px;
-  background: rgb(38 53 44 / 6%);
-  color: var(--rm-forest-soft);
-  font-size: 11px;
+.negotiable-badge {
+  color: var(--rm-accent);
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
   white-space: nowrap;
-
-  &.is-sold {
-    border-color: var(--rm-line);
-    background: var(--rm-paper-deep);
-    color: var(--rm-muted);
-  }
 }
 
-.title {
-  margin: 0 0 10px;
-  color: var(--rm-ink);
-  font-size: 19px;
-  font-weight: 600;
-  line-height: 1.45;
-}
-
-/* 分類與位置收成一行，減少零散層級 */
-.meta-row {
+.pill-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 18px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
-.location {
-  margin: 0;
-  color: var(--rm-muted);
-  font-size: 12.5px;
-  letter-spacing: 0.02em;
-}
-
-.category {
-  display: inline-block;
-  margin: 0;
-  padding: 3px 9px;
+.status-pill,
+.pill {
+  padding: 6px 12px;
   border: 1px solid var(--rm-line);
-  border-radius: 3px;
-  background: transparent;
+  border-radius: 999px;
+  background: var(--rm-surface);
+  color: var(--rm-ink-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-pill.is-sold {
+  border-color: transparent;
+  background: var(--rm-paper-deep);
   color: var(--rm-muted);
-  font-size: 11px;
-  letter-spacing: 0.08em;
 }
 
 .section {
-  padding-top: 16px;
-  border-top: 1px solid var(--rm-line);
+  margin-top: 30px;
 
   h3 {
-    margin: 0 0 8px;
-    color: var(--rm-muted);
-    font-family: var(--rm-display-font);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.16em;
+    margin: 0 0 10px;
+    color: var(--rm-ink);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
   }
+}
+
+.trade-list {
+  border-top: 1px solid var(--rm-line);
+  border-bottom: 1px solid var(--rm-line);
+}
+
+.trade-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 2px;
+
+  & + .trade-row {
+    border-top: 1px solid var(--rm-line);
+  }
+}
+
+.trade-label {
+  color: var(--rm-muted);
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+}
+
+.trade-value {
+  color: var(--rm-ink);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
 }
 
 .description {
   margin: 0;
   color: var(--rm-ink-soft);
-  font-size: 14px;
+  font-size: 14.5px;
   line-height: 1.8;
   white-space: pre-wrap;
 }
@@ -178,19 +250,21 @@ ion-content {
   font-size: 13px;
 }
 
-/* 賣家自己的操作（編輯／標記售出／刪除） */
 .owner-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 28px;
+
+  ion-button {
+    --border-radius: 12px;
+  }
 }
 
-/* 編輯 modal 內的輸入框 */
 .field {
   --background: var(--rm-surface);
   border: 1px solid var(--rm-line);
-  border-radius: 4px;
+  border-radius: 10px;
   margin-bottom: 10px;
 }
 
@@ -200,12 +274,10 @@ ion-content {
   font-size: 13px;
 }
 
-/* 底部有交易欄時，內容要留出空間避免被遮住 */
 ion-content.has-buyer-bar {
-  --padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  --padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
-/* 買家交易操作欄：固定貼在畫面底部 */
 .buyer-action-bar {
   position: fixed;
   bottom: 0;
@@ -214,23 +286,26 @@ ion-content.has-buyer-bar {
   display: flex;
   gap: 12px;
   width: 100%;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 12px 20px calc(14px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--rm-line);
-  background: var(--rm-surface);
-  box-shadow: 0 -10px 30px rgb(33 31 26 / 5%);
+  background: var(--rm-paper);
 
   ion-button {
     flex: 1;
     margin: 0;
-    --border-radius: 4px;
+    height: 50px;
+    --border-radius: 12px;
+    font-weight: 700;
   }
 
   .offer-btn {
     --border-color: var(--rm-ink);
     --color: var(--rm-ink);
+    --background: transparent;
+    --border-width: 1.5px;
   }
 
   .contact-btn {
-    --box-shadow: 0 8px 18px rgb(169 80 47 / 22%);
+    --box-shadow: 0 10px 22px rgb(142 59 43 / 28%);
   }
 }

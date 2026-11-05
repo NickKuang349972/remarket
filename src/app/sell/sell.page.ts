@@ -5,6 +5,7 @@ import {
   IonButton,
   IonContent,
   IonHeader,
+  IonIcon,
   IonInput,
   IonItem,
   IonSelect,
@@ -12,13 +13,18 @@ import {
   IonSpinner,
   IonTextarea,
   IonTitle,
+  IonToggle,
   IonToolbar,
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { cameraOutline, close } from 'ionicons/icons';
 
 import { GeocodingService } from '../services/geocoding.service';
 import { ProductService } from '../services/product.service';
 import { UserDataService } from '../services/user-data.service';
 import { PRODUCT_CATEGORIES } from '../models/product-category';
+
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
 @Component({
   selector: 'app-sell',
@@ -31,30 +37,38 @@ import { PRODUCT_CATEGORIES } from '../models/product-category';
     IonToolbar,
     IonTitle,
     IonContent,
+    IonIcon,
     IonItem,
     IonInput,
     IonSelect,
     IonSelectOption,
     IonTextarea,
+    IonToggle,
     IonButton,
     IonSpinner,
   ],
 })
 export class SellPage {
   title = '';
-  /** type="number" 的 ion-input 會回傳 number，所以這裡兩種型別都要接受 */
   priceText: string | number = '';
   description = '';
   readonly categories = PRODUCT_CATEGORIES;
   category = '其他';
 
-  imageFile: File | null = null;
-  imagePreview: string | null = null;
+  readonly conditionOptions = ['全新未拆', '99新', '轻微使用痕迹', '明显使用痕迹', '有破损'];
+  readonly deliveryOptions = ['面交', '顺丰快递', '平邮'];
+  conditionLabel = '轻微使用痕迹';
+  deliveryMethod = '面交';
+  isNegotiable = false;
+
+  readonly MAX_PHOTOS = 8;
+  imageFiles: File[] = [];
+  imagePreviews: string[] = [];
+  photoError = '';
 
   lat: number | null = null;
   lng: number | null = null;
   isLocating = false;
-  /** 賣家填的地區名，例如「旺角」 */
   addressText = '';
   isLookingUpAddress = false;
 
@@ -67,19 +81,53 @@ export class SellPage {
     private geocoding: GeocodingService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) {
+    addIcons({ close, cameraOutline });
+  }
+
+  get isPhotoFull(): boolean {
+    return this.imageFiles.length >= this.MAX_PHOTOS;
+  }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
+    const files = input.files;
+    if (!files) return;
 
-    this.imageFile = file;
+    this.photoError = '';
 
-    if (this.imagePreview) {
-      URL.revokeObjectURL(this.imagePreview);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      if (this.imageFiles.length >= this.MAX_PHOTOS) {
+        this.photoError = `最多只能加入 ${this.MAX_PHOTOS} 張相片`;
+        break;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        this.photoError = `「${file.name}」不是圖片，已略過`;
+        continue;
+      }
+
+      if (file.size > MAX_PHOTO_BYTES) {
+        this.photoError = `「${file.name}」超過 5MB，已略過`;
+        continue;
+      }
+
+      this.imageFiles.push(file);
+      this.imagePreviews.push(URL.createObjectURL(file));
     }
 
-    this.imagePreview = file ? URL.createObjectURL(file) : null;
+    input.value = '';
+    this.cdr.markForCheck();
+  }
+
+  removeImage(index: number) {
+    URL.revokeObjectURL(this.imagePreviews[index]);
+    this.imagePreviews.splice(index, 1);
+    this.imageFiles.splice(index, 1);
+    this.photoError = '';
+    this.cdr.markForCheck();
   }
 
   useCurrentLocation() {
@@ -98,7 +146,6 @@ export class SellPage {
         this.isLocating = false;
         this.cdr.markForCheck();
 
-        // 順便把經緯度轉成地區名，讓賣家不用自己打
         void this.lookupAddress(this.lat, this.lng);
       },
       () => {
@@ -110,7 +157,6 @@ export class SellPage {
     );
   }
 
-  /** 用座標反查地區名；如果賣家已經自己打了，就不覆蓋 */
   private async lookupAddress(lat: number, lng: number) {
     this.isLookingUpAddress = true;
     this.cdr.markForCheck();
@@ -151,12 +197,14 @@ export class SellPage {
         description: this.description.trim(),
         category: this.category,
         address: this.addressText.trim(),
-        image: this.imageFile,
+        condition_label: this.conditionLabel,
+        delivery_method: this.deliveryMethod,
+        is_negotiable: this.isNegotiable,
+        images: this.imageFiles,
         lat: this.lat ?? 22.3193,
         lng: this.lng ?? 114.1694,
       });
 
-      // 記住這件是自己刊登的，之後在「我的」頁可以列出
       if (newProductId) {
         this.userData.addMyListing(newProductId);
       }
@@ -177,13 +225,16 @@ export class SellPage {
     this.description = '';
     this.addressText = '';
     this.category = '其他';
-    this.imageFile = null;
 
-    if (this.imagePreview) {
-      URL.revokeObjectURL(this.imagePreview);
-    }
+    this.conditionLabel = '轻微使用痕迹';
+    this.deliveryMethod = '面交';
+    this.isNegotiable = false;
 
-    this.imagePreview = null;
+    this.imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    this.imageFiles = [];
+    this.imagePreviews = [];
+    this.photoError = '';
+
     this.lat = null;
     this.lng = null;
   }

@@ -3,17 +3,11 @@ import { computed, Injectable, signal } from '@angular/core';
 const FAVORITES_KEY = 'remarket.favorites';
 const MY_LISTINGS_KEY = 'remarket.myListings';
 
-/**
- * 把「使用者自己的資料」存在瀏覽器（localStorage）。
- * 目前未有會員系統，所以收藏和自己的刊登都先記在本機；
- * 日後加入登入功能時，只需把這個 service 換成打 API。
- */
 @Injectable({ providedIn: 'root' })
 export class UserDataService {
   private readonly favoriteIdsSignal = signal<number[]>(this.readIds(FAVORITES_KEY));
   private readonly myListingIdsSignal = signal<number[]>(this.readIds(MY_LISTINGS_KEY));
 
-  /** 收藏數量（給「我的」頁顯示） */
   readonly favoritesCount = computed(() => this.favoriteIdsSignal().length);
 
   get favoriteIds(): number[] {
@@ -28,7 +22,6 @@ export class UserDataService {
     return this.favoriteIdsSignal().includes(Number(id));
   }
 
-  /** 切換收藏，回傳切換後是否已收藏 */
   toggleFavorite(id: number): boolean {
     const numericId = Number(id);
     const current = this.favoriteIdsSignal();
@@ -42,7 +35,6 @@ export class UserDataService {
     return next.includes(numericId);
   }
 
-  /** 刊登成功後記下這件商品是自己發佈的 */
   addMyListing(id: number) {
     const numericId = Number(id);
     const current = this.myListingIdsSignal();
@@ -56,7 +48,6 @@ export class UserDataService {
     this.writeIds(MY_LISTINGS_KEY, next);
   }
 
-  /** 刪除商品後，把它從「我的刊登」移除 */
   removeMyListing(id: number) {
     const numericId = Number(id);
     const next = this.myListingIdsSignal().filter((item) => item !== numericId);

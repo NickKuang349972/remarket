@@ -1,54 +1,43 @@
-// ReMarket 主題色：紙張、墨綠與陶土色的二手家具目錄
-// 設計北極星：像翻一本印刷精緻的二手設計家具目錄——溫潤紙色、深墨綠、陶土紅，
-// 標題用襯線體，邊框用髮絲線，留白比裝飾更重要。
-
 :root {
-  /* 品牌色票 */
-  --rm-paper: #f3ede1;
-  --rm-paper-deep: #e9e1d2;
-  --rm-surface: #fffdf8;
-  --rm-ink: #211f1a;
-  --rm-ink-soft: #4d493f;
-  --rm-muted: #857e6f;
-  --rm-line: #e0d7c6;
-  --rm-forest: #26352c;
-  --rm-forest-soft: #3d5245;
-  --rm-accent: #a9502f;
-  --rm-accent-soft: #f0ddd2;
+  --rm-paper: #f5efe3;
+  --rm-paper-deep: #ebe3d2;
+  --rm-surface: #fdfbf4;
+  --rm-ink: #2c1e15;
+  --rm-ink-soft: #55432f;
+  --rm-muted: #8d7c68;
+  --rm-line: #e3d9c5;
+  --rm-forest: #32241a;
+  --rm-forest-soft: #504030;
+  --rm-accent: #8e3b2b;
+  --rm-accent-soft: #f2e0d7;
   --rm-display-font: Georgia, 'Times New Roman', 'Noto Serif TC', 'Songti TC', 'SimSun',
     serif;
 
-  /* 主色：陶土紅（主要操作） */
-  --ion-color-primary: #a9502f;
-  --ion-color-primary-rgb: 169, 80, 47;
-  --ion-color-primary-contrast: #fffaf3;
-  --ion-color-primary-contrast-rgb: 255, 250, 243;
-  --ion-color-primary-shade: #954629;
-  --ion-color-primary-tint: #b25f42;
+  --ion-color-primary: #8e3b2b;
+  --ion-color-primary-rgb: 142, 59, 43;
+  --ion-color-primary-contrast: #fff7ef;
+  --ion-color-primary-contrast-rgb: 255, 247, 239;
+  --ion-color-primary-shade: #7d3426;
+  --ion-color-primary-tint: #994f40;
 
-  /* 輔色：深林墨綠（品牌、標題） */
-  --ion-color-secondary: #26352c;
-  --ion-color-secondary-rgb: 38, 53, 44;
-  --ion-color-secondary-contrast: #f3ede1;
-  --ion-color-secondary-contrast-rgb: 243, 237, 225;
-  --ion-color-secondary-shade: #212e26;
-  --ion-color-secondary-tint: #3d4a41;
+  --ion-color-secondary: #2c1e15;
+  --ion-color-secondary-rgb: 44, 30, 21;
+  --ion-color-secondary-contrast: #f5efe3;
+  --ion-color-secondary-contrast-rgb: 245, 239, 227;
+  --ion-color-secondary-shade: #271a13;
+  --ion-color-secondary-tint: #41342c;
 
-  /* 背景與文字：奶油紙色、墨色字 */
   --ion-background-color: var(--rm-paper);
-  --ion-background-color-rgb: 243, 237, 225;
+  --ion-background-color-rgb: 245, 239, 227;
   --ion-text-color: var(--rm-ink);
-  --ion-text-color-rgb: 33, 31, 26;
+  --ion-text-color-rgb: 44, 30, 21;
 
-  /* 卡片與列表一律紙白，和紙色底形成層次 */
   --ion-card-background: var(--rm-surface);
   --ion-item-background: var(--rm-surface);
 
-  /* 工具列：深墨綠配紙色字 */
   --ion-toolbar-background: var(--rm-forest);
   --ion-toolbar-color: var(--rm-paper);
 
-  /* 字體：標題襯線、正文系統無襯線 */
   --ion-font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang HK', 'Microsoft JhengHei',
     'Noto Sans TC', 'Helvetica Neue', Arial, sans-serif;

@@ -1,37 +1,25 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>我的</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <div class="profile-hero">
-    <div class="avatar">R</div>
-    <h2 class="name">ReMarket 用戶</h2>
-    <p class="slogan">二手物品，找到新主人</p>
+  <div class="page-head">
+    <div class="brand-head">
+      <div class="who">
+        <h1 class="name">ReMarket 用戶</h1>
+        <p class="slogan">二手物品，找到新主人</p>
+      </div>
+      <div class="avatar">R</div>
+    </div>
   </div>
 
   <div class="content-wrap">
-    <ion-grid class="ion-no-padding stats">
-      <ion-row>
-        <ion-col size="6">
-          <ion-card class="stat-card">
-            <ion-card-content>
-              <p class="stat-value">{{ myProducts.length }}</p>
-              <p class="stat-label">我的刊登</p>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="6">
-          <ion-card class="stat-card">
-            <ion-card-content>
-              <p class="stat-value">{{ favoriteProducts.length }}</p>
-              <p class="stat-label">我的收藏</p>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <div class="stats">
+      <div class="stat">
+        <p class="stat-value">{{ myProducts.length }}</p>
+        <p class="stat-label">我的刊登</p>
+      </div>
+      <div class="stat">
+        <p class="stat-value">{{ favoriteProducts.length }}</p>
+        <p class="stat-label">我的收藏</p>
+      </div>
+    </div>
 
     <h3 class="section-title">我的刊登</h3>
     @if (myProducts.length > 0) {

@@ -5,16 +5,10 @@ export interface Coordinates {
   lng: number;
 }
 
-/**
- * 位置相關工具：取得目前位置 + 計算兩點距離。
- * 「附近優先」排序和地圖定位都用這個 service。
- */
 @Injectable({ providedIn: 'root' })
 export class LocationService {
-  /** 目前位置；未定位時為 null */
   readonly current = signal<Coordinates | null>(null);
 
-  /** 向瀏覽器要求定位；使用者拒絕或逾時就回傳 null */
   async locate(): Promise<Coordinates | null> {
     if (!navigator.geolocation) {
       return null;
@@ -37,7 +31,6 @@ export class LocationService {
     });
   }
 
-  /** Haversine 公式：回傳兩點的直線距離（公里） */
   distanceKm(from: Coordinates, to: Coordinates): number {
     const earthRadiusKm = 6371;
     const dLat = this.toRadians(to.lat - from.lat);

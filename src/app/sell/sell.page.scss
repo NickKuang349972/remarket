@@ -2,61 +2,184 @@ ion-content {
   --background: var(--rm-paper);
 }
 
-.sell-head {
-  padding: 26px 20px 18px;
+.page-head {
+  padding: 24px 20px 0;
+}
 
-  h2 {
-    margin: 0 0 6px;
-    color: var(--rm-ink);
-    font-family: var(--rm-display-font);
-    font-size: 26px;
-    font-weight: 600;
-    line-height: 1.25;
-    letter-spacing: 0.02em;
-  }
+.page-title {
+  margin: 0 0 6px;
+  color: var(--rm-ink);
+  font-family: var(--rm-display-font);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
 
-  p {
-    margin: 0;
-    color: var(--rm-muted);
-    font-size: 13px;
-    letter-spacing: 0.02em;
-  }
+.page-sub {
+  margin: 0;
+  color: var(--rm-muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 .content-wrap {
-  padding: 0 16px 30px;
+  padding: 0 20px 30px;
 }
 
-.photo-picker {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  aspect-ratio: 16 / 10;
+.photo-section {
   margin-bottom: 4px;
-  overflow: hidden;
-  border: 1px dashed #cbbfa9;
-  border-radius: 8px;
-  background: var(--rm-surface);
-  color: var(--rm-muted);
-  font-size: 14px;
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease;
+}
 
-  &:hover {
-    border-color: var(--rm-accent);
-    background: #fbf4ec;
-  }
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.photo-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--rm-paper-deep);
+  animation: photo-tile-in 0.16s ease both;
 
   img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+}
+
+@keyframes photo-tile-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cover-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--rm-accent);
+  color: #fff7ef;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.remove-photo-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(253 251 244 / 92%);
+  box-shadow: 0 1px 6px rgb(44 30 21 / 18%);
+  color: var(--rm-ink-soft);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+
+  ion-icon {
+    font-size: 14px;
+  }
+
+  &:hover {
+    background: var(--rm-surface);
+  }
+
+  &:active {
+    transform: scale(0.88);
+  }
+}
+
+.photo-add-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border: 1px dashed var(--rm-line);
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    border-color: var(--rm-accent);
+    background: var(--rm-surface);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &.is-empty {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 10;
+    gap: 8px;
+
+    .add-icon-wrap {
+      width: 46px;
+      height: 46px;
+
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+
+    .add-label {
+      font-size: 14px;
+    }
+  }
+
+  .add-icon-wrap {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--rm-accent-soft);
+    color: var(--rm-accent);
+
+    ion-icon {
+      font-size: 20px;
+    }
+  }
+
+  .add-label {
+    color: var(--rm-ink-soft);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .add-sub {
+    color: var(--rm-muted);
+    font-size: 11px;
+    letter-spacing: 0.02em;
   }
 
   input[type='file'] {
@@ -67,42 +190,39 @@ ion-content {
   }
 }
 
-.picker-label {
-  color: var(--rm-ink-soft);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+.photo-error {
+  margin: 8px 4px 0;
+  color: var(--rm-accent);
+  font-size: 12px;
 }
 
 .picker-hint {
+  margin: 8px 2px 0;
   color: var(--rm-muted);
   font-size: 11px;
   letter-spacing: 0.02em;
 }
 
 .form-title {
-  margin: 22px 4px 10px;
-  color: var(--rm-muted);
-  font-family: var(--rm-display-font);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  margin: 28px 2px 0;
+  color: var(--rm-ink);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
-/* 表單統一放在紙白卡內，用髮絲線分隔欄位 */
 .form-card {
-  padding: 4px 16px 8px;
-  border: 1px solid var(--rm-line);
-  border-radius: 8px;
-  background: var(--rm-surface);
+  margin-top: 4px;
+  border-top: 1px solid var(--rm-line);
 }
 
 .field {
   --background: transparent;
   --padding-start: 0;
   --inner-padding-end: 0;
-  --min-height: 64px;
+  --min-height: 60px;
   --color: var(--rm-ink);
+  --placeholder-color: var(--rm-muted);
   margin-bottom: 0;
   border-bottom: 1px solid var(--rm-line);
 
@@ -111,13 +231,19 @@ ion-content {
   }
 }
 
+.toggle-field ion-toggle {
+  padding: 0;
+  color: var(--rm-ink);
+  font-size: 14px;
+}
+
 .location {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
   padding: 12px 0 8px;
-  border-top: 1px solid var(--rm-line);
+  border-bottom: 1px solid var(--rm-line);
 }
 
 .coords {
@@ -132,17 +258,17 @@ ion-content {
 .error {
   margin: 14px 4px 0;
   color: var(--rm-accent);
-  font-size: 13px;
+  font-size: 12.5px;
 }
 
 .submit {
-  --border-radius: 4px;
-  --box-shadow: 0 10px 22px rgb(169 80 47 / 20%);
+  --border-radius: 12px;
+  --box-shadow: 0 10px 22px rgb(142 59 43 / 28%);
   height: 50px;
-  margin-top: 20px;
+  margin-top: 24px;
   font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .sell-note {

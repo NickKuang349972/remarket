@@ -1,37 +1,35 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" class="pd-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home" text="返回"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/home" text=""></ion-back-button>
     </ion-buttons>
 
-    <ion-title>商品詳情</ion-title>
-
-    @if (product) {
-      <ion-buttons slot="end">
+    <ion-buttons slot="end">
+      @if (product) {
         <ion-button (click)="toggleFavorite()">
           <ion-icon
             slot="icon-only"
             [name]="isFavorite ? 'heart' : 'heart-outline'"
-            [style.color]="isFavorite ? '#d9a07f' : '#f3ede1'"
+            [style.color]="isFavorite ? '#8e3b2b' : '#2c1e15'"
           ></ion-icon>
         </ion-button>
 
         <ion-button (click)="share()">
           <ion-icon slot="icon-only" name="share-outline"></ion-icon>
         </ion-button>
-      </ion-buttons>
-    }
+      }
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" [class.has-buyer-bar]="showBuyerBar">
   @if (isLoading) {
-    <div class="photo">
+    <div class="photo-container">
       <ion-skeleton-text [animated]="true" class="photo-skeleton"></ion-skeleton-text>
     </div>
     <div class="body">
+      <ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text>
       <ion-skeleton-text [animated]="true" style="width: 40%"></ion-skeleton-text>
-      <ion-skeleton-text [animated]="true" style="width: 80%"></ion-skeleton-text>
       <ion-skeleton-text [animated]="true" style="width: 100%"></ion-skeleton-text>
     </div>
   } @else if (notFound) {
@@ -40,8 +38,21 @@
       <p class="hint">它可能已經被賣家下架了</p>
     </div>
   } @else if (product) {
-    <div class="photo">
-      @if (product.image) {
+    <div class="photo-container">
+      @if (product.images && product.images.length > 0) {
+        <div class="photo-scroll">
+          @for (img of product.images; track img) {
+            <div class="photo-item">
+              <img
+                class="hero"
+                [class.is-sold]="isSold"
+                [src]="imageUrl(img)"
+                [alt]="product.title"
+              />
+            </div>
+          }
+        </div>
+      } @else if (product.image) {
         <img
           class="hero"
           [class.is-sold]="isSold"
@@ -60,25 +71,50 @@
     </div>
 
     <div class="body">
+      <h1 class="pd-title">{{ product.title }}</h1>
+      <p class="pd-meta">
+        {{ product.category }}@if (product.address) { · {{ product.address }} }
+      </p>
+
       <div class="price-row">
-        <p class="price">HK$ {{ product.price }}</p>
-        <span class="status-badge" [class.is-sold]="isSold">
+        <p class="pd-price">HK$ {{ product.price }}</p>
+        @if (isNegotiable) {
+          <span class="negotiable-badge">可议价</span>
+        }
+      </div>
+
+      <div class="pill-row">
+        <span class="status-pill" [class.is-sold]="isSold">
           {{ isSold ? '已售出' : '在售' }}
         </span>
-      </div>
-      <h2 class="title">{{ product.title }}</h2>
-
-      <div class="meta-row">
-        @if (product.category) {
-          <span class="category">{{ product.category }}</span>
+        @if (product.condition_label) {
+          <span class="pill">{{ product.condition_label }}</span>
         }
-
-        @if (product.address) {
-          <span class="location">📍 {{ product.address }}</span>
-        } @else if (product.lat && product.lng) {
-          <span class="location">📍 已標記位置</span>
+        @if (product.delivery_method) {
+          <span class="pill">{{ product.delivery_method }}</span>
         }
       </div>
+
+      @if (product.condition_label || product.delivery_method) {
+        <div class="section">
+          <h3>交易信息</h3>
+          <div class="trade-list">
+            @if (product.condition_label) {
+              <div class="trade-row">
+                <span class="trade-label">商品状况</span>
+                <span class="trade-value">{{ product.condition_label }}</span>
+              </div>
+            }
+
+            @if (product.delivery_method) {
+              <div class="trade-row">
+                <span class="trade-label">交易方式</span>
+                <span class="trade-value">{{ product.delivery_method }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <div class="section">
         <h3>商品說明</h3>
@@ -120,7 +156,6 @@
   }
 </ion-content>
 
-<!-- 買家交易操作欄：非本人商品且仍在售時才顯示 -->
 @if (showBuyerBar) {
   <div class="buyer-action-bar">
     <ion-button class="offer-btn" fill="outline" expand="block" (click)="makeOffer()">

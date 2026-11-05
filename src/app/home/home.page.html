@@ -1,63 +1,62 @@
-<ion-header [translucent]="true">
-  <ion-toolbar class="brand-bar">
-    <ion-title>
-      <span class="brand-name">ReMarket</span>
-      <span class="brand-tagline">CURATED SECONDHAND · 二手好物</span>
-    </ion-title>
-  </ion-toolbar>
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="loadProducts($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <ion-toolbar class="search-toolbar">
+  <div class="page-head">
+    <div class="brand-head">
+      <h1 class="brand-name">ReMarket</h1>
+      <div class="avatar">R</div>
+    </div>
+
     <ion-searchbar
       [debounce]="200"
       placeholder="搜尋商品，例如：單車、書枱"
       showClearButton="always"
       (ionInput)="onSearch($event)"
     ></ion-searchbar>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-refresher slot="fixed" (ionRefresh)="loadProducts($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+    <div class="chips">
+      @for (category of categories; track category) {
+        <ion-chip
+          class="chip"
+          [class.active]="selectedCategory === category"
+          (click)="selectCategory(category)"
+        >
+          @if (selectedCategory === category) {
+            <span class="chip-check">✓</span>
+          }
+          {{ category }}
+        </ion-chip>
+      }
+    </div>
 
-  <!-- 分類篩選 -->
-  <div class="chips">
-    @for (category of categories; track category) {
-      <ion-chip
-        class="chip"
-        [class.active]="selectedCategory === category"
-        (click)="selectCategory(category)"
-      >
-        {{ category }}
-      </ion-chip>
-    }
+    <ion-segment
+      class="sort"
+      mode="ios"
+      [value]="sortBy"
+      (ionChange)="onSortChange($event)"
+      [disabled]="isLoading"
+    >
+      <ion-segment-button value="new">
+        <ion-label>最新</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="priceAsc">
+        <ion-label>價格 ↑</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="priceDesc">
+        <ion-label>價格 ↓</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="distance">
+        <ion-label>距離</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <p class="count-line">{{ filteredProducts.length }} 件商品</p>
   </div>
-
-  <!-- 排序 -->
-  <ion-segment
-    class="sort"
-    [value]="sortBy"
-    (ionChange)="onSortChange($event)"
-    [disabled]="isLoading"
-  >
-    <ion-segment-button value="new">
-      <ion-label>最新</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="priceAsc">
-      <ion-label>價格 ↑</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="priceDesc">
-      <ion-label>價格 ↓</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="distance">
-      <ion-label>距離</ion-label>
-    </ion-segment-button>
-  </ion-segment>
 
   <ion-grid class="ion-no-padding">
     <ion-row>
-      <!-- 載入中：顯示骨架卡片 -->
       @if (isLoading) {
         @for (i of [1, 2, 3, 4]; track i) {
           <ion-col size="6" class="card-col">
@@ -65,16 +64,15 @@
               <div class="thumb">
                 <ion-skeleton-text [animated]="true" class="thumb-skeleton"></ion-skeleton-text>
               </div>
-              <ion-card-content class="card-body">
-                <ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text>
-                <ion-skeleton-text [animated]="true" style="width: 90%"></ion-skeleton-text>
-              </ion-card-content>
+              <div class="card-body">
+                <ion-skeleton-text [animated]="true" style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text [animated]="true" style="width: 45%"></ion-skeleton-text>
+              </div>
             </ion-card>
           </ion-col>
         }
       }
 
-      <!-- 商品卡片 -->
       @for (item of filteredProducts; track item.id) {
         <ion-col size="6" class="card-col">
           <ion-card
@@ -109,20 +107,25 @@
               </ion-button>
             </div>
 
-            <ion-card-content class="card-body">
-              <p class="price">HK$ {{ item.price }}</p>
-              <p class="title">{{ item.title }}</p>
-              @if (metaText(item)) {
-                <p class="addr">{{ metaText(item) }}</p>
+            <div class="card-body">
+              <h3 class="card-title">{{ item.title }}</h3>
+              <p class="card-meta">
+                {{ item.category }}@if (item.address) { · {{ item.address }}
+                }@if (distanceText(item)) { · {{ distanceText(item) }} }
+              </p>
+              <p class="card-price">HK$ {{ item.price }}</p>
+              @if (item.status === 'sold') {
+                <p class="card-note is-sold">已售出</p>
+              } @else if (+(item.is_negotiable ?? 0) === 1) {
+                <p class="card-note">可议价 · 可小刀</p>
               }
-            </ion-card-content>
+            </div>
           </ion-card>
         </ion-col>
       }
     </ion-row>
   </ion-grid>
 
-  <!-- 狀態提示 -->
   @if (!isLoading && hasError) {
     <div class="empty-state">
       <p>無法連線到伺服器</p>

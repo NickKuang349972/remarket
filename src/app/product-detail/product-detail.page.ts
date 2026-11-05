@@ -68,7 +68,6 @@ export class ProductDetailPage implements OnInit {
   isLoading = true;
   notFound = false;
 
-  // 編輯表單
   isEditOpen = false;
   editTitle = '';
   editPrice: string | number = '';
@@ -79,7 +78,6 @@ export class ProductDetailPage implements OnInit {
   isSaving = false;
   editError = '';
 
-  /** 正在切換「已售出／在售」狀態 */
   isUpdatingStatus = false;
 
   constructor(
@@ -112,27 +110,24 @@ export class ProductDetailPage implements OnInit {
     return this.product ? this.userData.isFavorite(this.product.id) : false;
   }
 
-  /** 這件商品是不是自己刊登的（決定要不要顯示編輯／刪除） */
   get isMine(): boolean {
     return this.product
       ? this.userData.myListingIds.map(Number).includes(Number(this.product.id))
       : false;
   }
 
-  /** 是否已售出（後端回傳 'sold'） */
   get isSold(): boolean {
     return this.product?.status === 'sold';
   }
 
-  /**
-   * 買家交易操作欄是否顯示：
-   * 只看別人的商品，而且商品仍在售（舊資料沒有 status 時當作在售）。
-   */
+  get isNegotiable(): boolean {
+    return Number(this.product?.is_negotiable ?? 0) === 1;
+  }
+
   get showBuyerBar(): boolean {
     return !!this.product && !this.isMine && (this.product.status ?? 'available') === 'available';
   }
 
-  /** 出價：跳 Alert 輸入金額，確認後用 Toast 模擬送出 */
   async makeOffer() {
     if (!this.product) {
       return;
@@ -158,7 +153,7 @@ export class ProductDetailPage implements OnInit {
 
             if (!Number.isFinite(price) || price <= 0) {
               void this.showToast('請輸入有效的出價');
-              return false; // 留在 Alert，讓使用者重新輸入
+              return false;
             }
 
             void this.sendOffer(price);
@@ -172,7 +167,6 @@ export class ProductDetailPage implements OnInit {
     this.cdr.markForCheck();
   }
 
-  /** 聯絡賣家：開啟郵件應用（目前未有站內即時訊息 API） */
   async contactSeller() {
     if (!this.product) {
       return;
@@ -185,7 +179,6 @@ export class ProductDetailPage implements OnInit {
     this.cdr.markForCheck();
   }
 
-  /** 目前未有出價 API，先用 Toast 模擬已送出 */
   private async sendOffer(price: number) {
     if (!this.product) {
       return;
@@ -193,11 +186,9 @@ export class ProductDetailPage implements OnInit {
 
     const formatted = price.toLocaleString('en-HK');
     await this.showToast(`已向賣家發送出價 HK$ ${formatted}`);
-    // 無 zone 模式：async 之後要主動通知 Angular 重畫
     this.cdr.markForCheck();
   }
 
-  /** 切換已售出／重新上架（只有自己的商品才看得到按鈕） */
   async toggleSold() {
     if (!this.product || this.isUpdatingStatus) {
       return;
@@ -220,14 +211,12 @@ export class ProductDetailPage implements OnInit {
         status: nextStatus,
       });
 
-      // 後端已更新成功，直接改本地資料，畫面即時反映
       this.product.status = nextStatus;
       await this.showToast(nextStatus === 'sold' ? '已標記為售出' : '已重新上架');
     } catch (error) {
       await this.showToast(error instanceof Error ? error.message : '更新狀態失敗');
     } finally {
       this.isUpdatingStatus = false;
-      // 無 zone 模式：async 之後要主動通知 Angular 重畫
       this.cdr.markForCheck();
     }
   }
@@ -239,7 +228,6 @@ export class ProductDetailPage implements OnInit {
     }
   }
 
-  /** 分享商品：手機支援系統分享面板，否則複製連結 */
   async share() {
     if (!this.product) {
       return;
@@ -313,7 +301,6 @@ export class ProductDetailPage implements OnInit {
         address: this.editAddress.trim(),
         lat: Number(this.product.lat ?? 22.3193),
         lng: Number(this.product.lng ?? 114.1694),
-        // 編輯商品時保留原本的狀態，避免把「已售出」改回在售
         status: this.product.status ?? 'available',
       });
 
@@ -381,12 +368,10 @@ export class ProductDetailPage implements OnInit {
       this.notFound = true;
     } finally {
       this.isLoading = false;
-      // 無 zone 模式：async 之後要主動通知 Angular 重畫
       this.cdr.markForCheck();
     }
   }
 
-  /** 保險：超過指定時間就當作失敗，避免畫面永遠停在載入中 */
   private withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     return Promise.race([
       promise,

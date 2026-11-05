@@ -66,7 +66,6 @@ export class ProfilePage {
     this.myProducts = products.filter((product) => myIds.includes(Number(product.id)));
     this.favoriteProducts = products.filter((product) => favoriteIds.includes(Number(product.id)));
 
-    // 無 zone 模式：async 之後要主動通知 Angular 重畫
     this.cdr.markForCheck();
   }
 

@@ -1,5 +1,4 @@
 <?php
-// 更新商品 API：接受 multipart/form-data（可選擇換一張相片）
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -34,6 +33,13 @@ if ($status !== '' && !in_array($status, ['available', 'sold'], true)) {
     respond('error', '商品狀態不正確');
 }
 
+$conditionLabel = trim($_POST['condition_label'] ?? '');
+$deliveryMethod = trim($_POST['delivery_method'] ?? '');
+$isNegotiable = null;
+if (isset($_POST['is_negotiable']) && $_POST['is_negotiable'] !== '') {
+    $isNegotiable = !empty($_POST['is_negotiable']) ? 1 : 0;
+}
+
 if (!is_numeric($id)) {
     respond('error', '缺少商品編號');
 }
@@ -47,50 +53,16 @@ if (!is_numeric($lat) || !is_numeric($lng)) {
     respond('error', '缺少有效的座標');
 }
 
-$newImagePath = null;
-
-if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-    if ($_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-        respond('error', '相片上傳失敗');
-    }
-    if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
-        respond('error', '相片不能超過 5MB');
-    }
-
-    $allowed = [
-        'image/jpeg' => 'jpg',
-        'image/png'  => 'png',
-        'image/webp' => 'webp',
-        'image/gif'  => 'gif',
-    ];
-    $mime = mime_content_type($_FILES['image']['tmp_name']);
-
-    if (!isset($allowed[$mime])) {
-        respond('error', '只支援 JPG / PNG / WEBP / GIF 格式');
-    }
-
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0775, true);
-    }
-
-    $filename = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
-
-    if (!move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . '/' . $filename)) {
-        respond('error', '無法儲存相片');
-    }
-
-    $newImagePath = 'uploads/' . $filename;
-}
-
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $check = $pdo->prepare("SELECT id, image FROM products WHERE id = :id");
-    $check->execute([':id' => $id]);
-    $existing = $check->fetch(PDO::FETCH_ASSOC);
+    $pdo->beginTransaction();
 
-    if (!$existing) {
+    $check = $pdo->prepare("SELECT id FROM products WHERE id = :id");
+    $check->execute([':id' => $id]);
+    if (!$check->fetch()) {
+        $pdo->rollBack();
         http_response_code(404);
         respond('error', '找不到這件商品');
     }
@@ -114,25 +86,97 @@ try {
         $params[':status'] = $status;
     }
 
-    if ($newImagePath !== null) {
-        $sql .= ", image = :image";
-        $params[':image'] = $newImagePath;
+    if ($conditionLabel !== '') {
+        $sql .= ", condition_label = :condition_label";
+        $params[':condition_label'] = $conditionLabel;
+    }
+
+    if ($deliveryMethod !== '') {
+        $sql .= ", delivery_method = :delivery_method";
+        $params[':delivery_method'] = $deliveryMethod;
+    }
+
+    if ($isNegotiable !== null) {
+        $sql .= ", is_negotiable = :is_negotiable";
+        $params[':is_negotiable'] = $isNegotiable;
     }
 
     $sql .= " WHERE id = :id";
-
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
-    if ($newImagePath !== null && !empty($existing['image']) && str_starts_with($existing['image'], 'uploads/')) {
-        $oldFile = __DIR__ . '/' . $existing['image'];
-        if (is_file($oldFile)) {
-            unlink($oldFile);
+    $hasNewImages = false;
+    if (isset($_FILES['image'])) {
+        if (is_array($_FILES['image']['name']) && !empty($_FILES['image']['name'][0])) {
+            $hasNewImages = true;
+        } elseif (!is_array($_FILES['image']['name']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $hasNewImages = true;
         }
     }
 
+    if ($hasNewImages) {
+        $oldImgStmt = $pdo->prepare("SELECT path FROM product_images WHERE product_id = :id");
+        $oldImgStmt->execute([':id' => $id]);
+        $oldImages = $oldImgStmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $delImgStmt = $pdo->prepare("DELETE FROM product_images WHERE product_id = :id");
+        $delImgStmt->execute([':id' => $id]);
+
+        foreach ($oldImages as $oldPath) {
+            if (!empty($oldPath) && str_starts_with($oldPath, 'uploads/')) {
+                $oldFile = __DIR__ . '/' . $oldPath;
+                if (is_file($oldFile)) {
+                    unlink($oldFile);
+                }
+            }
+        }
+
+        $files = $_FILES['image'];
+        $fileCount = is_array($files['name']) ? count($files['name']) : 1;
+        $allowed = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+        ];
+
+        $insImgStmt = $pdo->prepare("INSERT INTO product_images (product_id, path) VALUES (:product_id, :path)");
+
+        for ($i = 0; $i < $fileCount; $i++) {
+            $error   = is_array($files['error']) ? $files['error'][$i] : $files['error'];
+            $size    = is_array($files['size']) ? $files['size'][$i] : $files['size'];
+            $tmpName = is_array($files['tmp_name']) ? $files['tmp_name'][$i] : $files['tmp_name'];
+
+            if ($error !== UPLOAD_ERR_OK || $size > 5 * 1024 * 1024) {
+                continue;
+            }
+
+            $mime = mime_content_type($tmpName);
+            if (!isset($allowed[$mime])) {
+                continue;
+            }
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0775, true);
+            }
+
+            $filename = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
+
+            if (move_uploaded_file($tmpName, $uploadDir . '/' . $filename)) {
+                $insImgStmt->execute([
+                    ':product_id' => $id,
+                    ':path'       => 'uploads/' . $filename
+                ]);
+            }
+        }
+    }
+
+    $pdo->commit();
     respond('success', '商品已更新');
 
-} catch (PDOException $e) {
+} catch (Exception $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     respond('error', '資料庫錯誤：' . $e->getMessage());
 }

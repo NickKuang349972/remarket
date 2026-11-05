@@ -1,5 +1,4 @@
 <?php
-// 刪除商品 API：接受 multipart/form-data（id）
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -28,23 +27,26 @@ try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $check = $pdo->prepare("SELECT id, image FROM products WHERE id = :id");
+    $check = $pdo->prepare("SELECT id FROM products WHERE id = :id");
     $check->execute([':id' => $id]);
-    $existing = $check->fetch(PDO::FETCH_ASSOC);
-
-    if (!$existing) {
+    if (!$check->fetch()) {
         http_response_code(404);
         respond('error', '找不到這件商品');
     }
 
+    $imgStmt = $pdo->prepare("SELECT path FROM product_images WHERE product_id = :id");
+    $imgStmt->execute([':id' => $id]);
+    $images = $imgStmt->fetchAll(PDO::FETCH_COLUMN);
+
     $stmt = $pdo->prepare("DELETE FROM products WHERE id = :id");
     $stmt->execute([':id' => $id]);
 
-    // 同時刪掉上傳的相片檔（只刪 uploads 內的檔案）
-    if (!empty($existing['image']) && str_starts_with($existing['image'], 'uploads/')) {
-        $file = __DIR__ . '/' . $existing['image'];
-        if (is_file($file)) {
-            unlink($file);
+    foreach ($images as $imgPath) {
+        if (!empty($imgPath) && str_starts_with($imgPath, 'uploads/')) {
+            $file = __DIR__ . '/' . $imgPath;
+            if (is_file($file)) {
+                unlink($file);
+            }
         }
     }
 

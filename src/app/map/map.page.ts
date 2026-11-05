@@ -16,6 +16,18 @@ import * as L from 'leaflet';
 import { LocationService } from '../services/location.service';
 import { Product, ProductService } from '../services/product.service';
 
+const LARGE_PIN_ZOOM = 14;
+
+const PLACEHOLDER_IMAGE =
+  'data:image/svg+xml;charset=utf-8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
+      '<rect width="64" height="64" fill="#f0ddd2"/>' +
+      '<circle cx="32" cy="27" r="9" fill="none" stroke="#a9502f" stroke-width="3"/>' +
+      '<rect x="17" y="42" width="30" height="5" rx="2.5" fill="#a9502f" opacity="0.45"/>' +
+      '</svg>',
+  );
+
 @Component({
   selector: 'app-map',
   templateUrl: 'map.page.html',
@@ -29,6 +41,8 @@ export class MapPage {
   private map?: L.Map;
   private markerLayer?: L.LayerGroup;
   private userMarker?: L.Marker;
+  private products: Product[] = [];
+  private renderedZoom?: number;
 
   constructor(
     private productService: ProductService,
@@ -38,7 +52,6 @@ export class MapPage {
     addIcons({ locateOutline });
   }
 
-  /** 每次進入地圖分頁都重新載入商品，刊登完回來就會多一個標記 */
   async ionViewDidEnter() {
     let products: Product[] = [];
 
@@ -48,14 +61,16 @@ export class MapPage {
       console.error('載入地圖商品失敗', error);
     }
 
+    this.products = products.filter(
+      (product) => (product.status ?? 'available') === 'available',
+    );
+
     this.ensureMap();
-    this.renderMarkers(products);
+    this.renderMarkers(this.products, true);
   }
 
-  /** 第一次進入時建立地圖，之後重複使用同一個實例 */
   private ensureMap() {
     if (!this.map && this.mapContainer) {
-      // zoomControl: false → 稍後手動加到右下角，避免被頁首遮住
       this.map = L.map(this.mapContainer.nativeElement, { zoomControl: false }).setView(
         [22.3193, 114.1694],
         11,
@@ -69,13 +84,27 @@ export class MapPage {
       }).addTo(this.map);
 
       this.markerLayer = L.layerGroup().addTo(this.map);
+
+      this.map.on('zoomend', () => this.handleZoomEnd());
     }
 
-    // 分頁在背景時地圖容器尺寸是 0，回到前景要重新計算
     this.map?.invalidateSize();
   }
 
-  /** 定位到自己的位置（藍點），並把地圖移到那裡 */
+  private handleZoomEnd() {
+    if (!this.map) {
+      return;
+    }
+
+    const zoom = this.map.getZoom();
+
+    if (zoom === this.renderedZoom) {
+      return;
+    }
+
+    this.renderMarkers(this.products);
+  }
+
   async locateMe() {
     const position = await this.locationService.locate();
 
@@ -102,12 +131,16 @@ export class MapPage {
       .bindPopup('你在這裡');
   }
 
-  private renderMarkers(products: Product[]) {
+  private renderMarkers(products: Product[], fitToPoints = false) {
     if (!this.map || !this.markerLayer) {
       return;
     }
 
     this.markerLayer.clearLayers();
+
+    const zoom = this.map.getZoom();
+    this.renderedZoom = zoom;
+    const useLargePin = zoom >= LARGE_PIN_ZOOM;
 
     const points: L.LatLngTuple[] = [];
 
@@ -121,7 +154,11 @@ export class MapPage {
 
       points.push([lat, lng]);
 
-      const marker = L.marker([lat, lng], { icon: this.pinIcon() }).addTo(this.markerLayer);
+      const marker = L.marker([lat, lng], {
+        icon: useLargePin
+          ? this.largePinIcon(this.bubbleImage(product), product.price)
+          : this.smallPinIcon(),
+      }).addTo(this.markerLayer);
 
       const addressLine = product.address
         ? `<br><span style="color:#6b7a70">📍 ${this.escapeHtml(product.address)}</span>`
@@ -136,19 +173,33 @@ export class MapPage {
       });
     }
 
-    if (points.length > 0) {
+    if (fitToPoints && points.length > 0) {
       this.map.fitBounds(L.latLngBounds(points).pad(0.25));
     }
   }
 
-  /** 用 CSS 畫一個綠色圓點，避免 Leaflet 預設圖示在打包後路徑失效 */
-  private pinIcon(): L.DivIcon {
+  private smallPinIcon(): L.DivIcon {
     return L.divIcon({
       className: 'remarket-pin',
       html: '<span></span>',
       iconSize: [18, 18],
       iconAnchor: [9, 9],
     });
+  }
+
+  private largePinIcon(imageUrl: string, price: number): L.DivIcon {
+    const safeUrl = this.escapeHtml(imageUrl);
+
+    return L.divIcon({
+      className: 'remarket-pin-large',
+      html: `<div class="bubble"><img src="${safeUrl}" alt="" draggable="false" /><span class="price">HK$ ${price}</span></div>`,
+      iconSize: [64, 64],
+      iconAnchor: [32, 64],
+    });
+  }
+
+  private bubbleImage(product: Product): string {
+    return this.productService.imageUrl(product.image) ?? PLACEHOLDER_IMAGE;
   }
 
   private escapeHtml(text: string): string {

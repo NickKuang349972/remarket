@@ -2,118 +2,130 @@ ion-content {
   --background: var(--rm-paper);
 }
 
-/* 頂部個人卡：深墨綠 + 陶土色頭像，像會員卡 */
-.profile-hero {
-  padding: 34px 20px 44px;
-  background: linear-gradient(180deg, #26352c 0%, #33463a 100%);
-  border-radius: 0 0 16px 16px;
-  color: var(--rm-paper);
-  text-align: center;
+.page-head {
+  padding: 24px 20px 0;
+}
+
+.brand-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.who .name {
+  margin: 0;
+  color: var(--rm-ink);
+  font-family: var(--rm-display-font);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.who .slogan {
+  margin: 6px 0 0;
+  color: var(--rm-muted);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
 }
 
 .avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 76px;
-  height: 76px;
-  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: var(--rm-accent);
-  box-shadow: 0 10px 24px rgb(0 0 0 / 22%);
-  color: var(--rm-paper);
+  background: var(--rm-accent-soft);
+  color: var(--rm-accent);
   font-family: var(--rm-display-font);
-  font-size: 30px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
 }
 
-.name {
-  margin: 0 0 5px;
-  font-family: var(--rm-display-font);
-  font-size: 21px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.slogan {
-  margin: 0;
-  color: rgb(243 237 225 / 60%);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-}
-
-/* 內文往上升，讓統計卡壓在墨綠卡邊緣 */
 .content-wrap {
-  position: relative;
-  margin-top: -24px;
-  padding: 0 16px 32px;
+  padding: 0 20px 32px;
 }
 
+/* 統計：髮絲線夾住的平鋪雙欄，中間一道直分隔線 */
 .stats {
-  margin: 0 -4px;
+  display: flex;
+  margin-top: 20px;
+  border-top: 1px solid var(--rm-line);
+  border-bottom: 1px solid var(--rm-line);
 }
 
-.stat-card {
-  margin: 0;
-  border: 1px solid var(--rm-line);
-  border-radius: 8px;
-  background: var(--rm-surface);
-  box-shadow: 0 8px 20px rgb(33 31 26 / 5%);
+.stat {
+  flex: 1;
+  padding: 14px 0;
+  text-align: center;
+
+  & + .stat {
+    border-left: 1px solid var(--rm-line);
+  }
 }
 
 .stat-value {
   margin: 0;
   color: var(--rm-ink);
-  font-family: var(--rm-display-font);
-  font-size: 30px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
 
 .stat-label {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
   color: var(--rm-muted);
   font-size: 11px;
   letter-spacing: 0.08em;
 }
 
 .section-title {
-  margin: 26px 4px 10px;
-  color: var(--rm-muted);
-  font-family: var(--rm-display-font);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  margin: 28px 2px 0;
+  color: var(--rm-ink);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .item-list {
+  margin-top: 4px;
   background: transparent;
+  border-top: 1px solid var(--rm-line);
+  border-bottom: 1px solid var(--rm-line);
 }
 
-/* 每筆刊登/收藏都是一張紙白卡 */
 ion-item {
-  --background: var(--rm-surface);
-  --padding-start: 12px;
-  --inner-padding-end: 12px;
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
   --min-height: 76px;
-  margin-bottom: 8px;
-  border: 1px solid var(--rm-line);
-  border-radius: 8px;
-  overflow: hidden;
+  margin-bottom: 0;
+  border-radius: 0;
+
+  & + ion-item {
+    border-top: 1px solid var(--rm-line);
+  }
 }
 
 .thumb {
+  /* 禁止被長標題擠壓變形，讓省略號發生在標題上 */
+  flex: 0 0 auto;
   width: 56px;
   height: 56px;
-  margin-right: 12px;
-  border-radius: 4px;
+  margin-right: 14px;
+  border-radius: 14px;
   background: var(--rm-paper-deep);
   object-fit: cover;
 
   &.is-sold {
     filter: grayscale(1);
-    opacity: 0.85;
+    opacity: 0.82;
   }
+}
+
+ion-label {
+  min-width: 0;
 }
 
 ion-label {
@@ -121,58 +133,58 @@ ion-label {
     margin: 0;
     overflow: hidden;
     color: var(--rm-ink);
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 15.5px;
+    font-weight: 700;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .price {
     margin: 5px 0 0;
-    color: var(--rm-accent);
-    font-family: var(--ion-font-family);
-    font-size: 13.5px;
+    color: var(--rm-muted);
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: -0.01em;
     font-variant-numeric: tabular-nums;
+  }
+
+  p:not(.price) {
+    margin: 0;
+    color: var(--rm-muted);
+    font-size: 12.5px;
   }
 }
 
 .status-tag {
   flex: 0 0 auto;
   margin-right: 2px;
-  padding: 3px 8px;
-  border: 1px solid rgb(38 53 44 / 18%);
+  padding: 4px 10px;
+  border: 1px solid var(--rm-line);
   border-radius: 999px;
-  background: rgb(38 53 44 / 5%);
-  color: var(--rm-forest-soft);
-  font-size: 10.5px;
+  background: var(--rm-surface);
+  color: var(--rm-ink-soft);
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 
   &.is-sold {
-    border-color: var(--rm-line);
+    border-color: transparent;
     background: var(--rm-paper-deep);
     color: var(--rm-muted);
   }
 }
 
-.about-list ion-item {
-  margin-bottom: 0;
-}
-
 .version {
   color: var(--rm-muted);
-  font-family: var(--rm-display-font);
   font-size: 12px;
 }
 
 .empty {
   margin: 0;
   padding: 18px;
-  border: 1px dashed #cbbfa9;
-  border-radius: 8px;
-  background: var(--rm-surface);
+  border: 1px dashed var(--rm-line);
+  border-radius: 14px;
   color: var(--rm-muted);
   font-size: 13px;
   text-align: center;
