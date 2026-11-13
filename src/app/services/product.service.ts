@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface Product {
   id: number;
@@ -48,6 +49,7 @@ interface ApiResponse<T> {
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
   private readonly baseUrl = environment.apiBaseUrl;
 
   async getProducts(): Promise<Product[]> {
@@ -106,7 +108,9 @@ export class ProductService {
     }
 
     const response = await firstValueFrom(
-      this.http.post<ApiResponse<never>>(`${this.baseUrl}/add_product.php`, form),
+      this.http.post<ApiResponse<never>>(`${this.baseUrl}/add_product.php`, form, {
+        headers: this.auth.authHeaders(),
+      }),
     );
 
     if (response.status !== 'success') {
@@ -148,7 +152,9 @@ export class ProductService {
     }
 
     const response = await firstValueFrom(
-      this.http.post<ApiResponse<never>>(`${this.baseUrl}/update_product.php`, form),
+      this.http.post<ApiResponse<never>>(`${this.baseUrl}/update_product.php`, form, {
+        headers: this.auth.authHeaders(),
+      }),
     );
 
     if (response.status !== 'success') {
@@ -161,7 +167,9 @@ export class ProductService {
     form.append('id', String(id));
 
     const response = await firstValueFrom(
-      this.http.post<ApiResponse<never>>(`${this.baseUrl}/delete_product.php`, form),
+      this.http.post<ApiResponse<never>>(`${this.baseUrl}/delete_product.php`, form, {
+        headers: this.auth.authHeaders(),
+      }),
     );
 
     if (response.status !== 'success') {
