@@ -15,14 +15,14 @@ try {
 
     if ($category !== '') {
         $stmt = $pdo->prepare(
-            "SELECT id, title, price, description, category, address, lat, lng, status,
+            "SELECT id, title, price, description, category, address, lat, lng, status, seller,
                     condition_label, delivery_method, is_negotiable
              FROM products WHERE category = :category ORDER BY id DESC"
         );
         $stmt->execute([':category' => $category]);
     } else {
         $stmt = $pdo->query(
-            "SELECT id, title, price, description, category, address, lat, lng, status,
+            "SELECT id, title, price, description, category, address, lat, lng, status, seller,
                     condition_label, delivery_method, is_negotiable
              FROM products ORDER BY id DESC"
         );

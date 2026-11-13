@@ -1,18 +1,8 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-
-$host = 'localhost';
-$dbname = 'carousell_db';
-$username = 'root';
-$password = '';
+// 新增商品（必須登入，賣家由 token 判定）
+require __DIR__ . '/auth_common.php';
 
 $uploadDir = __DIR__ . '/uploads';
-
-function respond($status, $message, $extra = []) {
-    echo json_encode(array_merge(["status" => $status, "message" => $message], $extra), JSON_UNESCAPED_UNICODE);
-    exit;
-}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -46,14 +36,15 @@ if (!is_numeric($lat) || !is_numeric($lng)) {
 }
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = db();
+    $user = require_user($pdo);
+    $seller = $user['username'];
 
     $pdo->beginTransaction();
 
     $stmt = $pdo->prepare(
-        "INSERT INTO products (title, price, description, category, address, lat, lng, status, condition_label, delivery_method, is_negotiable)
-         VALUES (:title, :price, :description, :category, :address, :lat, :lng, :status, :condition_label, :delivery_method, :is_negotiable)"
+        "INSERT INTO products (title, price, description, category, address, lat, lng, status, seller, condition_label, delivery_method, is_negotiable)
+         VALUES (:title, :price, :description, :category, :address, :lat, :lng, :status, :seller, :condition_label, :delivery_method, :is_negotiable)"
     );
 
     $stmt->execute([
@@ -65,6 +56,7 @@ try {
         ':lat'             => $lat,
         ':lng'             => $lng,
         ':status'          => $status,
+        ':seller'          => $seller,
         ':condition_label' => $conditionLabel,
         ':delivery_method' => $deliveryMethod,
         ':is_negotiable'   => $isNegotiable,

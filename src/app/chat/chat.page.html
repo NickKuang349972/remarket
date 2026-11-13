@@ -1,0 +1,86 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text="返回"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>{{ product?.title || '聊天' }}</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar class="role-bar">
+    <div class="role">
+      @if (isOwner) {
+        <span>你是賣家 · 這裡是買家的查詢</span>
+      } @else {
+        <span>你正在聯絡賣家 · 以「{{ auth.username }}」的身分</span>
+      }
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content #chatContent [fullscreen]="true" class="chat-content">
+  @if (messages.length === 0) {
+    <div class="empty">
+      <p>還沒有訊息</p>
+      <p class="hint">打聲招呼吧 👋</p>
+    </div>
+  } @else {
+    <div class="messages">
+      @for (message of messages; track message.id) {
+        <div class="row" [class.mine]="isMine(message)">
+          <div class="bubble">
+            @if (!isMine(message)) {
+              <p class="sender">{{ message.sender }}</p>
+            }
+
+            @if (message.image) {
+              <img class="bubble-image" [src]="imageUrl(message.image)" alt="聊天圖片" />
+            }
+
+            @if (message.content) {
+              <p class="text">{{ message.content }}</p>
+            }
+
+            <p class="time">{{ message.created_at }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</ion-content>
+
+@if (auth.isLoggedIn) {
+  <ion-footer>
+    <ion-toolbar>
+      <div class="composer">
+        <label class="photo-btn" [class.disabled]="isUploading">
+          @if (isUploading) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            <ion-icon name="camera-outline"></ion-icon>
+          }
+          <input
+            type="file"
+            accept="image/*"
+            [disabled]="isUploading"
+            (change)="onImageSelected($event)"
+          />
+        </label>
+
+        <ion-input
+          placeholder="輸入訊息…"
+          [(ngModel)]="draft"
+          (keyup.enter)="send()"
+        ></ion-input>
+
+        <ion-button (click)="send()" [disabled]="isSending || !draft.trim()">
+          @if (isSending) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+          }
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}

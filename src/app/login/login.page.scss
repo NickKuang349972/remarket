@@ -1,0 +1,82 @@
+.login-content {
+  --background: var(--ion-background-color);
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  padding: 48px 24px;
+}
+
+.brand {
+  margin-bottom: 28px;
+  text-align: center;
+
+  h1 {
+    margin: 0 0 6px;
+    color: var(--ion-text-color);
+    font-family: var(--rm-display-font, Georgia, serif);
+    font-size: 30px;
+    letter-spacing: 1px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--rm-muted, #8d7c68);
+    font-size: 13px;
+  }
+}
+
+.card {
+  padding: 22px 18px;
+  border-radius: 16px;
+  background: var(--ion-card-background);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 7%);
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--rm-line, #e3d9c5);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  color: var(--rm-muted, #8d7c68);
+  font-size: 15px;
+  cursor: pointer;
+
+  &.active {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 var(--ion-color-primary);
+  }
+}
+
+.field {
+  --background: var(--ion-background-color);
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+.error {
+  margin: 4px 0 12px;
+  color: var(--ion-color-primary);
+  font-size: 13px;
+}
+
+.hint {
+  margin: 14px 0 0;
+  color: var(--rm-muted, #8d7c68);
+  font-size: 12px;
+  text-align: center;
+}

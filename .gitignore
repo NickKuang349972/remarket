@@ -82,3 +82,6 @@ Thumbs.db
 # 本機暫存／工具用資料夾
 /.pylibs
 /.tmp
+
+# 本機暫存資料夾
+/.work

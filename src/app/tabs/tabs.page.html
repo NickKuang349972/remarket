@@ -5,6 +5,11 @@
       <ion-label>首頁</ion-label>
     </ion-tab-button>
 
+    <ion-tab-button tab="auction" href="/tabs/auction">
+      <ion-icon name="hammer-outline"></ion-icon>
+      <ion-label>拍賣</ion-label>
+    </ion-tab-button>
+
     <ion-tab-button tab="map" href="/tabs/map">
       <ion-icon name="map-outline"></ion-icon>
       <ion-label>地圖</ion-label>
@@ -18,6 +23,9 @@
     <ion-tab-button tab="profile" href="/tabs/profile">
       <ion-icon name="person-outline"></ion-icon>
       <ion-label>我的</ion-label>
+      @if (unreadCount > 0) {
+        <ion-badge color="danger">{{ unreadCount }}</ion-badge>
+      }
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

@@ -11,6 +11,8 @@ export interface Product {
   description: string;
   image?: string;
   images?: string[];
+  /** 賣家帳號（刊登時由後端依 token 寫入） */
+  seller?: string;
   category?: string;
   address?: string;
   lat?: number;

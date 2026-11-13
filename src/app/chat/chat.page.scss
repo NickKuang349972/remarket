@@ -1,0 +1,187 @@
+.chat-content {
+  --background: var(--ion-background-color);
+}
+
+/* 角色提示條：讓使用者知道自己是買家還是賣家 */
+.role-bar {
+  --background: var(--ion-card-background);
+  --min-height: 30px;
+  --border-width: 0 0 1px 0;
+  --border-color: var(--rm-line, #e3d9c5);
+}
+
+.role {
+  padding: 5px 16px;
+  color: var(--rm-muted, #8d7c68);
+  font-size: 12px;
+}
+
+.name-card {
+  margin: 32px 20px;
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--ion-card-background);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 6%);
+
+  h2 {
+    margin: 0 0 6px;
+    color: var(--ion-text-color);
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 16px;
+    color: var(--rm-muted, #8d7c68);
+    font-size: 13px;
+  }
+}
+
+.name-input {
+  --background: var(--ion-background-color);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+}
+
+.empty {
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--rm-muted, #8d7c68);
+
+  p {
+    margin: 0 0 6px;
+  }
+}
+
+.hint {
+  color: var(--rm-muted, #9aa89d);
+  font-size: 13px;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px 20px;
+}
+
+.row {
+  display: flex;
+  justify-content: flex-start;
+
+  &.mine {
+    justify-content: flex-end;
+  }
+}
+
+.bubble {
+  max-width: 76%;
+  padding: 10px 12px;
+  border-radius: 14px 14px 14px 4px;
+  background: var(--ion-card-background);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 6%);
+
+  .row.mine & {
+    border-radius: 14px 14px 4px 14px;
+    background: var(--ion-color-primary);
+  }
+}
+
+.bubble-image {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* 傳相片按鈕 */
+.photo-btn {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--rm-paper-deep);
+  color: var(--rm-ink-soft);
+
+  ion-icon {
+    font-size: 20px;
+  }
+
+  input[type='file'] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+.sender {
+  margin: 0 0 3px;
+  color: var(--rm-muted, #8d7c68);
+  font-size: 11px;
+}
+
+.text {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: 14px;
+  line-height: 1.45;
+  word-break: break-word;
+  white-space: pre-wrap;
+
+  .row.mine & {
+    color: var(--ion-color-primary-contrast);
+  }
+}
+
+.time {
+  margin: 4px 0 0;
+  color: var(--rm-muted, #a7b5aa);
+  font-size: 10px;
+  text-align: right;
+
+  .row.mine & {
+    color: rgb(255 247 239 / 65%);
+  }
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+
+  ion-input {
+    --background: var(--ion-background-color);
+    /* 外層 footer 是深色，不指定文字顏色會繼承成淺色，跟輸入框背景撞色 */
+    --color: var(--ion-text-color);
+    --placeholder-color: var(--rm-muted, #8d7c68);
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    border-radius: 20px;
+  }
+
+  ion-button {
+    --border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    margin: 0;
+  }
+}

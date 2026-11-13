@@ -180,6 +180,28 @@ ion-label {
   font-size: 12px;
 }
 
+/* 對話列表：最後一則訊息預覽 */
+.preview {
+  display: -webkit-box;
+  margin: 5px 0 0;
+  overflow: hidden;
+  color: var(--rm-muted);
+  font-size: 12.5px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+/* 未讀紅點 */
+.unread-dot {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  box-shadow: 0 0 0 3px var(--rm-accent-soft);
+}
+
 .empty {
   margin: 0;
   padding: 18px;

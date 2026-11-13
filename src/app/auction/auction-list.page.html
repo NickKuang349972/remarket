@@ -1,0 +1,58 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>拍賣會</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="auction-content">
+  @if (isLoading) {
+    <div class="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else if (error) {
+    <div class="empty">
+      <p>{{ error }}</p>
+    </div>
+  } @else if (auctions.length === 0) {
+    <div class="empty">
+      <p>目前沒有拍賣</p>
+      <p class="hint">按右下角的「＋」為你的商品開一場拍賣</p>
+    </div>
+  } @else {
+    <div class="list">
+      @for (auction of auctions; track auction.id) {
+        <button type="button" class="card" (click)="openAuction(auction)">
+          <div class="thumb">
+            @if (auction.image) {
+              <img [src]="imageUrl(auction.image)" [alt]="auction.title" />
+            } @else {
+              <span>無圖片</span>
+            }
+          </div>
+
+          <div class="body">
+            <div class="row">
+              <span class="state" [class.live]="auction.state === 'live'" [class.ended]="auction.state === 'ended'">
+                {{ stateText(auction) }}
+              </span>
+              <span class="time">{{ timeText(auction) }}</span>
+            </div>
+
+            <h2>{{ auction.title }}</h2>
+            <p class="price">{{ priceText(auction) }}</p>
+
+            @if (auction.leader) {
+              <p class="leader">領先：{{ auction.leader }}</p>
+            }
+          </div>
+        </button>
+      }
+    </div>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="createAuction()" aria-label="開拍賣">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

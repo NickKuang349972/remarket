@@ -36,6 +36,7 @@ import {
 
 import { Product, ProductService } from '../services/product.service';
 import { UserDataService } from '../services/user-data.service';
+import { AuthService } from '../services/auth.service';
 import { PRODUCT_CATEGORIES } from '../models/product-category';
 
 @Component({
@@ -87,6 +88,7 @@ export class ProductDetailPage implements OnInit {
     private toastController: ToastController,
     private alertController: AlertController,
     private cdr: ChangeDetectorRef,
+    public auth: AuthService,
     public userData: UserDataService,
   ) {
     addIcons({
@@ -110,10 +112,17 @@ export class ProductDetailPage implements OnInit {
     return this.product ? this.userData.isFavorite(this.product.id) : false;
   }
 
+  /** 這件商品是不是自己刊登的（有 seller 就以 seller 為準，跨裝置也正確） */
   get isMine(): boolean {
-    return this.product
-      ? this.userData.myListingIds.map(Number).includes(Number(this.product.id))
-      : false;
+    if (!this.product) {
+      return false;
+    }
+
+    if (this.product.seller) {
+      return this.product.seller === this.auth.username;
+    }
+
+    return this.userData.myListingIds.map(Number).includes(Number(this.product.id));
   }
 
   get isSold(): boolean {
@@ -172,11 +181,8 @@ export class ProductDetailPage implements OnInit {
       return;
     }
 
-    const subject = encodeURIComponent(`詢問商品：${this.product.title}`);
-    window.location.href = `mailto:seller@remarket.com?subject=${subject}`;
-
-    await this.showToast('已開啟郵件，向賣家查詢');
-    this.cdr.markForCheck();
+    // 進入即時聊天室（SSE），取代原本的 mailto 假功能
+    await this.router.navigate(['/chat', this.product.id]);
   }
 
   private async sendOffer(price: number) {

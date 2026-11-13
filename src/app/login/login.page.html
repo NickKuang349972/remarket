@@ -1,0 +1,65 @@
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="wrap">
+    <div class="brand">
+      <h1>ReMarket</h1>
+      <p>二手物品，找到新主人</p>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button
+          type="button"
+          class="tab"
+          [class.active]="mode === 'login'"
+          (click)="setMode('login')"
+        >
+          登入
+        </button>
+        <button
+          type="button"
+          class="tab"
+          [class.active]="mode === 'register'"
+          (click)="setMode('register')"
+        >
+          註冊
+        </button>
+      </div>
+
+      <ion-input
+        class="field"
+        placeholder="用戶名"
+        [(ngModel)]="username"
+        autocomplete="username"
+      ></ion-input>
+
+      <ion-input
+        class="field"
+        type="password"
+        placeholder="密碼（至少 6 個字）"
+        [(ngModel)]="password"
+        (keyup.enter)="submit()"
+        autocomplete="current-password"
+      ></ion-input>
+
+      @if (error) {
+        <p class="error">{{ error }}</p>
+      }
+
+      <ion-button expand="block" [disabled]="isLoading" (click)="submit()">
+        @if (isLoading) {
+          <ion-spinner name="dots"></ion-spinner>
+        } @else {
+          {{ mode === 'login' ? '登入' : '建立帳號' }}
+        }
+      </ion-button>
+
+      <p class="hint">
+        @if (mode === 'login') {
+          沒有帳號？按上面的「註冊」建立一個。
+        } @else {
+          註冊後會自動登入，資料存在本機瀏覽器。
+        }
+      </p>
+    </div>
+  </div>
+</ion-content>

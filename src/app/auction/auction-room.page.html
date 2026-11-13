@@ -1,0 +1,116 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/auction" text="返回"></ion-back-button>
+    </ion-buttons>
+    <ion-title>拍賣會</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="room-content">
+  @if (isLoading) {
+    <div class="loading"><ion-spinner name="crescent"></ion-spinner></div>
+  } @else if (error) {
+    <div class="empty">{{ error }}</div>
+  } @else if (auction) {
+    <div class="hero">
+      @if (auction.image) {
+        <img [src]="imageUrl(auction.image)" [alt]="auction.title" />
+      } @else {
+        <div class="no-image">無圖片</div>
+      }
+    </div>
+
+    <div class="panel">
+      <div class="head">
+        <span class="state" [class.live]="isLive" [class.ended]="now >= endTime">
+          {{ isLive ? '進行中' : (now < startTime ? '即將開始' : '已結束') }}
+        </span>
+        <span class="countdown">{{ countdownText }}</span>
+      </div>
+
+      <h1 class="title">{{ auction.title }}</h1>
+
+      <div class="price-row">
+        <div class="price-block">
+          <p class="label">現時最高價</p>
+          <p class="value">HK$ {{ currentBid > 0 ? currentBid : auction.start_price }}</p>
+          @if (auction.leader) {
+            <p class="leader">領先：{{ auction.leader }}</p>
+          } @else {
+            <p class="leader">尚未有人出價</p>
+          }
+        </div>
+
+        <div class="meta-block">
+          <p>起標 HK$ {{ auction.start_price }}</p>
+          <p>每次加價 HK$ {{ auction.min_increment }}</p>
+          <p>賣家 {{ auction.seller }}</p>
+        </div>
+      </div>
+
+      @if (auction.description) {
+        <p class="description">{{ auction.description }}</p>
+      }
+
+      @if (isSeller) {
+        <div class="notice">你是賣家，可以在下方留言宣傳，但不能出價。</div>
+      } @else if (isLive) {
+        <div class="bid-box">
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            [placeholder]="'最低 HK$ ' + minimumBid"
+            [(ngModel)]="draftBid"
+          ></ion-input>
+          <ion-button [disabled]="!auth.isLoggedIn" (click)="placeBid()">出價</ion-button>
+        </div>
+        @if (!auth.isLoggedIn) {
+          <p class="hint">請先登入才能出價</p>
+        }
+      } @else {
+        <div class="notice">{{ now < startTime ? '拍賣尚未開始，請準時回來。' : '拍賣已結束。' }}</div>
+      }
+    </div>
+
+    <div class="panel">
+      <h2 class="section">出價紀錄（即時）</h2>
+      @if (bids.length === 0) {
+        <p class="hint">還沒有人出價，你可以做第一個。</p>
+      } @else {
+        <ul class="bids">
+          @for (bid of bids.slice().reverse(); track bid.id) {
+            <li>
+              <span class="who">{{ bid.bidder }}</span>
+              <span class="amount">HK$ {{ bid.amount }}</span>
+              <span class="when">{{ bid.created_at }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="panel">
+      <h2 class="section">房間留言</h2>
+      @if (messages.length === 0) {
+        <p class="hint">賣家可以在這裡補充商品資訊。</p>
+      } @else {
+        <ul class="messages">
+          @for (message of messages; track message.id) {
+            <li>
+              <span class="who">{{ message.author }}</span>
+              <span class="text">{{ message.content }}</span>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (auth.isLoggedIn) {
+        <div class="bid-box">
+          <ion-input placeholder="留言…" [(ngModel)]="draftMessage" (keyup.enter)="sendMessage()"></ion-input>
+          <ion-button fill="outline" (click)="sendMessage()">送出</ion-button>
+        </div>
+      }
+    </div>
+  }
+</ion-content>

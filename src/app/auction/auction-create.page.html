@@ -1,0 +1,62 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/auction" text="返回"></ion-back-button>
+    </ion-buttons>
+    <ion-title>開拍賣</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="create-content ion-padding">
+  @if (isLoading) {
+    <div class="loading"><ion-spinner name="crescent"></ion-spinner></div>
+  } @else if (myProducts.length === 0) {
+    <div class="empty">
+      <p>你還沒有刊登任何商品</p>
+      <p class="hint">先到「刊登」頁上架一件商品，再回來開拍賣。</p>
+    </div>
+  } @else {
+    <label class="field">
+      <span class="label">拍賣商品</span>
+      <select [(ngModel)]="selectedProductId">
+        @for (product of myProducts; track product.id) {
+          <option [value]="product.id">{{ product.title }}（HK$ {{ product.price }}）</option>
+        }
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="label">開始時間</span>
+      <input type="datetime-local" [(ngModel)]="startAt" />
+    </label>
+
+    <label class="field">
+      <span class="label">結束時間</span>
+      <input type="datetime-local" [(ngModel)]="endAt" />
+    </label>
+
+    <label class="field">
+      <span class="label">起標價 (HK$)</span>
+      <input type="number" inputmode="numeric" [(ngModel)]="startPrice" placeholder="例如：100" />
+    </label>
+
+    <label class="field">
+      <span class="label">最低加價 (HK$)</span>
+      <input type="number" inputmode="numeric" [(ngModel)]="minIncrement" placeholder="例如：10" />
+    </label>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+
+    <ion-button expand="block" [disabled]="isSubmitting" (click)="submit()">
+      @if (isSubmitting) {
+        <ion-spinner name="dots"></ion-spinner>
+      } @else {
+        建立拍賣
+      }
+    </ion-button>
+
+    <p class="hint">建立後買家可以在拍賣會看到，開始時間到了就能出價。</p>
+  }
+</ion-content>

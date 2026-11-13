@@ -1,18 +1,8 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-
-$host = 'localhost';
-$dbname = 'carousell_db';
-$username = 'root';
-$password = '';
+// 更新商品（必須登入，且只能改自己刊登的商品）
+require __DIR__ . '/auth_common.php';
 
 $uploadDir = __DIR__ . '/uploads';
-
-function respond($status, $message, $extra = []) {
-    echo json_encode(array_merge(["status" => $status, "message" => $message], $extra), JSON_UNESCAPED_UNICODE);
-    exit;
-}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -54,17 +44,26 @@ if (!is_numeric($lat) || !is_numeric($lng)) {
 }
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = db();
+    $user = require_user($pdo);
 
     $pdo->beginTransaction();
 
-    $check = $pdo->prepare("SELECT id FROM products WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, seller FROM products WHERE id = :id");
     $check->execute([':id' => $id]);
-    if (!$check->fetch()) {
+    $existingProduct = $check->fetch(PDO::FETCH_ASSOC);
+
+    if (!$existingProduct) {
         $pdo->rollBack();
         http_response_code(404);
         respond('error', '找不到這件商品');
+    }
+
+    // 只准賣家本人修改（seller 為空代表舊資料，容許修改）
+    if ($existingProduct['seller'] !== '' && $existingProduct['seller'] !== $user['username']) {
+        $pdo->rollBack();
+        http_response_code(403);
+        respond('error', '只能修改自己刊登的商品');
     }
 
     $sql = "UPDATE products

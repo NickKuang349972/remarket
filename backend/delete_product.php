@@ -1,16 +1,6 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-
-$host = 'localhost';
-$dbname = 'carousell_db';
-$username = 'root';
-$password = '';
-
-function respond($status, $message, $extra = []) {
-    echo json_encode(array_merge(["status" => $status, "message" => $message], $extra), JSON_UNESCAPED_UNICODE);
-    exit;
-}
+// 刪除商品（必須登入，且只能刪自己刊登的商品）
+require __DIR__ . '/auth_common.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -24,14 +14,21 @@ if (!is_numeric($id)) {
 }
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = db();
+    $user = require_user($pdo);
 
-    $check = $pdo->prepare("SELECT id FROM products WHERE id = :id");
+    $check = $pdo->prepare("SELECT id, seller FROM products WHERE id = :id");
     $check->execute([':id' => $id]);
-    if (!$check->fetch()) {
+    $existing = $check->fetch(PDO::FETCH_ASSOC);
+
+    if (!$existing) {
         http_response_code(404);
         respond('error', '找不到這件商品');
+    }
+
+    if ($existing['seller'] !== '' && $existing['seller'] !== $user['username']) {
+        http_response_code(403);
+        respond('error', '只能刪除自己刊登的商品');
     }
 
     $imgStmt = $pdo->prepare("SELECT path FROM product_images WHERE product_id = :id");
@@ -53,5 +50,6 @@ try {
     respond('success', '商品已刪除');
 
 } catch (PDOException $e) {
+    http_response_code(500);
     respond('error', '資料庫錯誤：' . $e->getMessage());
 }
