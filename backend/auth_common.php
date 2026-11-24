@@ -1,6 +1,4 @@
 <?php
-// 共用：資料庫連線、JSON 回應、token 驗證
-// 統一時區為香港，否則 PHP 的 date() 與 MySQL 的 NOW()（+08:00）會相差 8 小時
 date_default_timezone_set('Asia/Hong_Kong');
 
 header("Access-Control-Allow-Origin: *");
@@ -9,7 +7,6 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Max-Age: 86400");
 header("Content-Type: application/json; charset=UTF-8");
 
-// 瀏覽器帶 Authorization header 時會先送 OPTIONS 預檢，這裡直接放行
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
     http_response_code(204);
     exit;
@@ -35,11 +32,13 @@ function db(): PDO {
 }
 
 function respond($status, $message, $extra = []) {
-    echo json_encode(array_merge(["status" => $status, "message" => $message], $extra), JSON_UNESCAPED_UNICODE);
+    echo json_encode(
+        array_merge(["status" => $status, "message" => $message], $extra),
+        JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE
+    );
     exit;
 }
 
-/** 從 Authorization: Bearer xxx 取得 token */
 function bearer_token(): string {
     $header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
@@ -52,10 +51,10 @@ function bearer_token(): string {
         return $matches[1];
     }
 
-    return '';
+    $queryToken = $_GET['token'] ?? '';
+    return is_string($queryToken) ? $queryToken : '';
 }
 
-/** 用 token 找回目前使用者；找不到就回 null */
 function current_user(PDO $pdo): ?array {
     $token = bearer_token();
 
@@ -64,7 +63,7 @@ function current_user(PDO $pdo): ?array {
     }
 
     $stmt = $pdo->prepare(
-        "SELECT id, username FROM users
+        "SELECT id, username, nickname FROM users
          WHERE token = :token AND token_expires > NOW()"
     );
     $stmt->execute([':token' => $token]);
@@ -73,7 +72,6 @@ function current_user(PDO $pdo): ?array {
     return $user ?: null;
 }
 
-/** 要求必須登入，否則回 401 */
 function require_user(PDO $pdo): array {
     $user = current_user($pdo);
 
@@ -83,4 +81,41 @@ function require_user(PDO $pdo): array {
     }
 
     return $user;
+}
+
+function find_conversation(PDO $pdo, $conversationId): ?array {
+    $stmt = $pdo->prepare(
+        "SELECT c.id, c.product_id, c.buyer, c.seller,
+                p.title, p.price, p.description, p.status, p.category, p.address,
+                (SELECT pi.path FROM product_images pi
+                  WHERE pi.product_id = p.id ORDER BY pi.id ASC LIMIT 1) AS image
+         FROM conversations c
+         INNER JOIN products p ON p.id = c.product_id
+         WHERE c.id = :id"
+    );
+    $stmt->execute([':id' => $conversationId]);
+    $conversation = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $conversation ?: null;
+}
+
+function require_conversation(PDO $pdo, $conversationId, array $user): array {
+    if (!is_numeric($conversationId)) {
+        respond('error', '缺少對話編號');
+    }
+
+    $conversation = find_conversation($pdo, $conversationId);
+
+    if (!$conversation) {
+        http_response_code(404);
+        respond('error', '找不到這個對話');
+    }
+
+    if ($conversation['buyer'] !== $user['username']
+        && $conversation['seller'] !== $user['username']) {
+        http_response_code(403);
+        respond('error', '沒有權限查看這個對話');
+    }
+
+    return $conversation;
 }

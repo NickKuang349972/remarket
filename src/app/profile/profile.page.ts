@@ -1,28 +1,20 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
-  IonCard,
-  IonCardContent,
-  IonCol,
   IonContent,
-  IonGrid,
-  IonHeader,
   IonImg,
   IonItem,
   IonLabel,
   IonList,
-  IonRow,
-  IonTitle,
-  IonToolbar,
 } from '@ionic/angular';
 
 import { AuthService } from '../services/auth.service';
-import { ChatService, Conversation } from '../services/chat.service';
+import { ChatService, ConversationSummary } from '../services/chat.service';
 import { Product, ProductService } from '../services/product.service';
 import { UserDataService } from '../services/user-data.service';
 
-/** 「我的對話」列表的一列：對話摘要 + 是否未讀 */
-interface ConversationItem extends Conversation {
+/** 「我的對話」列表的一列：會話摘要 + 是否未讀 */
+interface ConversationItem extends ConversationSummary {
   unread: boolean;
 }
 
@@ -33,15 +25,7 @@ interface ConversationItem extends Conversation {
   standalone: true,
   imports: [
     RouterLink,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonCard,
-    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
@@ -61,6 +45,12 @@ export class ProfilePage {
     public auth: AuthService,
     public userData: UserDataService,
   ) {}
+
+  get displayName(): string {
+    const nickname = this.auth.user()?.nickname?.trim();
+
+    return nickname || this.auth.username || 'ReMarket 用戶';
+  }
 
   async logout() {
     await this.auth.logout();
@@ -91,7 +81,9 @@ export class ProfilePage {
 
       this.conversations = list.map((item) => ({
         ...item,
-        unread: Number(item.id) > this.userData.lastReadOf(Number(item.product_id)),
+        unread:
+          item.sender !== me &&
+          Number(item.last_message_id ?? 0) > this.userData.lastReadOf(item.conversation_id),
       }));
     } catch (error) {
       console.error('載入對話失敗', error);
@@ -103,6 +95,10 @@ export class ProfilePage {
 
   /** 對話列表的預覽文字 */
   previewText(item: ConversationItem): string {
+    if (!item.content) {
+      return `與 ${item.counterpart} 開始對話`;
+    }
+
     return `${item.sender}：${item.content}`;
   }
 

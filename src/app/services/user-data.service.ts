@@ -3,29 +3,27 @@ import { computed, Injectable, signal } from '@angular/core';
 const FAVORITES_KEY = 'remarket.favorites';
 const MY_LISTINGS_KEY = 'remarket.myListings';
 const NICKNAME_KEY = 'remarket.nickname';
-const CHAT_IDS_KEY = 'remarket.chatProducts';
 const LAST_READ_KEY = 'remarket.lastRead';
 
 @Injectable({ providedIn: 'root' })
 export class UserDataService {
   private readonly favoriteIdsSignal = signal<number[]>(this.readIds(FAVORITES_KEY));
   private readonly myListingIdsSignal = signal<number[]>(this.readIds(MY_LISTINGS_KEY));
-  private readonly chatProductIdsSignal = signal<number[]>(this.readIds(CHAT_IDS_KEY));
   private readonly nicknameSignal = signal<string>(this.readText(NICKNAME_KEY));
   private readonly lastReadSignal = signal<Record<string, number>>(this.readRecord(LAST_READ_KEY));
 
-  /** 某件商品最後一次讀到的訊息 id（用來判斷有沒有新訊息） */
-  lastReadOf(productId: number): number {
-    return this.lastReadSignal()[String(productId)] ?? 0;
+  /** 某條會話最後一次讀到的訊息 id（用來判斷有沒有新訊息） */
+  lastReadOf(conversationId: number): number {
+    return this.lastReadSignal()[String(conversationId)] ?? 0;
   }
 
   /** 進入聊天室時更新「已讀到哪裡」 */
-  markRead(productId: number, messageId: number) {
-    if (messageId <= this.lastReadOf(productId)) {
+  markRead(conversationId: number, messageId: number) {
+    if (messageId <= this.lastReadOf(conversationId)) {
       return;
     }
 
-    const next = { ...this.lastReadSignal(), [String(productId)]: Number(messageId) };
+    const next = { ...this.lastReadSignal(), [String(conversationId)]: Number(messageId) };
     this.lastReadSignal.set(next);
     this.writeRecord(LAST_READ_KEY, next);
   }
@@ -39,24 +37,6 @@ export class UserDataService {
     const value = name.trim();
     this.nicknameSignal.set(value);
     this.writeText(NICKNAME_KEY, value);
-  }
-
-  /** 我聊過天的商品 id（新的在前），給「我的」頁列出對話 */
-  get chatProductIds(): number[] {
-    return this.chatProductIdsSignal();
-  }
-
-  addChatProduct(id: number) {
-    const numericId = Number(id);
-    const current = this.chatProductIdsSignal();
-
-    if (current.includes(numericId)) {
-      return;
-    }
-
-    const next = [numericId, ...current];
-    this.chatProductIdsSignal.set(next);
-    this.writeIds(CHAT_IDS_KEY, next);
   }
 
   readonly favoritesCount = computed(() => this.favoriteIdsSignal().length);

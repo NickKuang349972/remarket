@@ -3,12 +3,10 @@ import { RouterLink } from '@angular/router';
 import {
   IonButton,
   IonCard,
-  IonCardContent,
   IonChip,
   IonCol,
   IonContent,
   IonGrid,
-  IonHeader,
   IonIcon,
   IonImg,
   IonLabel,
@@ -19,8 +17,6 @@ import {
   IonSegment,
   IonSegmentButton,
   IonSkeletonText,
-  IonTitle,
-  IonToolbar,
   ToastController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -29,6 +25,7 @@ import { heart, heartOutline } from 'ionicons/icons';
 import { Product, ProductService } from '../services/product.service';
 import { UserDataService } from '../services/user-data.service';
 import { LocationService } from '../services/location.service';
+import { AuthService } from '../services/auth.service';
 import { PRODUCT_CATEGORIES } from '../models/product-category';
 
 type SortOption = 'new' | 'priceAsc' | 'priceDesc' | 'distance';
@@ -40,9 +37,6 @@ type SortOption = 'new' | 'priceAsc' | 'priceDesc' | 'distance';
   standalone: true,
   imports: [
     RouterLink,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonSearchbar,
     IonSegment,
@@ -54,7 +48,6 @@ type SortOption = 'new' | 'priceAsc' | 'priceDesc' | 'distance';
     IonRow,
     IonCol,
     IonCard,
-    IonCardContent,
     IonChip,
     IonImg,
     IonButton,
@@ -75,10 +68,18 @@ export class HomePage {
     private productService: ProductService,
     private cdr: ChangeDetectorRef,
     private toastController: ToastController,
+    private auth: AuthService,
     public userData: UserDataService,
     public locationService: LocationService,
   ) {
     addIcons({ heart, heartOutline });
+  }
+
+  get avatarInitial(): string {
+    const nickname = this.auth.user()?.nickname?.trim();
+    const name = nickname || this.auth.username;
+
+    return (name || 'R').charAt(0);
   }
 
   ionViewWillEnter() {

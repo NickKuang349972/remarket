@@ -2,10 +2,10 @@
   <div class="page-head">
     <div class="brand-head">
       <div class="who">
-        <h1 class="name">{{ auth.username || 'ReMarket 用戶' }}</h1>
+        <h1 class="name">{{ displayName }}</h1>
         <p class="slogan">二手物品，找到新主人</p>
       </div>
-      <div class="avatar">{{ (auth.username || 'R').charAt(0) }}</div>
+      <div class="avatar">{{ displayName.charAt(0) }}</div>
     </div>
   </div>
 
@@ -49,16 +49,16 @@
     <h3 class="section-title">我的對話</h3>
     @if (conversations.length > 0) {
       <ion-list lines="none" class="item-list">
-        @for (item of conversations; track item.product_id) {
-          <ion-item [routerLink]="['/chat', item.product_id]" detail="true">
+        @for (item of conversations; track item.conversation_id) {
+          <ion-item [routerLink]="['/chat', item.conversation_id]" detail="true">
             <ion-img
               class="thumb"
               [src]="imageUrl(item.image)"
               [alt]="item.title"
             ></ion-img>
             <ion-label>
-              <h2>{{ item.title }}</h2>
-              <p class="preview">{{ previewText(item) }}</p>
+              <h2>{{ item.counterpart }}</h2>
+              <p class="preview">{{ item.title }} · {{ previewText(item) }}</p>
             </ion-label>
             @if (item.unread) {
               <span slot="end" class="unread-dot"></span>

@@ -16,7 +16,7 @@
 | 地圖 | Leaflet + OpenStreetMap 顯示**在售**商品位置；縮放聯動標記（縮小＝圓點、放大＝相片氣泡＋價格籤）、點標記跳到詳情、一鍵定位 |
 | 刊登 | **多張相片上傳**（最多 8 張、封面標記、單張刪除、格式／大小預檢）、標題／價格／說明、分類、**商品狀況／交易方式／接受議價**、取得目前位置並自動填入地區 |
 | 詳情 | **多圖左右滑動畫廊**、襯線標題、價格與**可議價標籤**、狀況／交易方式白膠囊與交易信息列表、分享；已售出商品自動去色並蓋章；賣家可編輯／標記售出／重新上架／刪除；買家有出價、**聯絡賣家（進入即時聊天）** |
-| 聊天 | **SSE 即時聊天**：以商品為單位開啟對話、訊息即時推送、**可傳圖片**、自動捲到底、區分買家／賣家角色 |
+| 聊天 | **SSE 即時聊天**：以「商品 + 買家」為單位開啟對話（同一商品的多個買家互不干擾）、訊息即時推送、**可傳圖片**、快捷回覆、自動捲到底；議價卡片即時更新，賣家可直接同意／拒絕，被拒絕的買家可在卡片上**再次出價** |
 | 拍賣 | **即時競價（SSE）**：賣家為自己的商品開拍賣（開始／結束、起標價、最低加價）、倒數中出價、出價紀錄即時更新、房間留言（賣家宣傳） |
 | 我的 | 我的刊登（數量與列表）、**我的對話**、我的收藏列表、App 資訊、**登出** |
 
@@ -48,8 +48,14 @@ backend/           <-- 需複製到 XAMPP 的 htdocs
   update_product.php    更新商品（可換多圖；未帶的欄位保留原值）
   delete_product.php    刪除商品（連同圖片檔案）
   get_products.php      讀取商品列表（聚合多圖 paths）
-  send_message.php      送出聊天訊息（需登入）
-  chat_stream.php       SSE 聊天串流（伺服器推送）
+  send_message.php      送出聊天訊息（需登入，帶 conversation_id）
+  chat_open.php         買家對商品開啟／取得自己的會話
+  chat_detail.php       單一會話詳情（商品＋訊息＋議價，僅成員可讀）
+  chat_conversations.php 我的會話列表（依 token 判定身份）
+  chat_stream.php       SSE 聊天串流（伺服器推送，需會話成員）
+  offer_state.php       買家對某件商品的最新出價狀態（判斷能否再出價）
+  offer_create.php      建立議價（同一會話同時只能有一筆待回覆或已同意）
+  offer_reply.php       賣家同意／拒絕議價（同意時作廢同會話其他待回覆出價）
   auth_common.php       共用：DB 連線、JSON 回應、token 驗證
   auth_register.php     註冊
   auth_login.php        登入
@@ -64,11 +70,14 @@ backend/           <-- 需複製到 XAMPP 的 htdocs
   database/
     carousell_db.sql                資料庫結構、六筆示範商品、示範對話與示範拍賣
     migration-add-trade-fields.sql  舊庫補交易欄位用
+    migration-add-category.sql      舊庫補商品分類用
+    migration-add-address.sql       舊庫補地址／經緯度用
     migration-add-messages.sql      舊庫補聊天表用
     migration-add-users.sql         舊庫補使用者表用
     migration-add-seller.sql        舊庫補賣家欄位用
     migration-add-chat-image.sql    舊庫補聊天圖片欄位用
     migration-add-auctions.sql      舊庫補拍賣表用
+    migration-add-conversations.sql 舊庫把聊天改成「商品 + 買家」會話用
   demo-images/          示範商品圖片（Pexels，可免費使用）
   uploads/              使用者上傳的相片
 ```
@@ -88,6 +97,7 @@ backend/           <-- 需複製到 XAMPP 的 htdocs
 3. **前端**：在專案根目錄執行 `npm install`
 4. 啟動 XAMPP 的 **Apache** 和 **MySQL**
 5. 執行 `npm start`，開啟 `http://localhost:4200`
+6. 沒有預設帳號，請先註冊；測試聊天／議價時，用另一個瀏覽器或無痕視窗註冊第二個帳號，分別扮演買家與賣家
 
 ## API
 
@@ -97,8 +107,14 @@ backend/           <-- 需複製到 XAMPP 的 htdocs
 | POST | `/remarket-backend/add_product.php` | `multipart/form-data`：title, price, description, category, address, lat, lng, condition_label, delivery_method, is_negotiable, `image[]`（多張，可選） |
 | POST | `/remarket-backend/update_product.php` | 同上＋`id`；沒帶的欄位保留原值 |
 | POST | `/remarket-backend/delete_product.php` | `id`；刪除紀錄並清理圖片檔案 |
-| POST | `/remarket-backend/send_message.php` | `product_id`, `content`；**需 `Authorization: Bearer`**，`sender` 由後端決定 |
-| GET | `/remarket-backend/chat_stream.php?product_id=` | **SSE 串流**，用 `EventSource` 連線，每次推送一則訊息 |
+| POST | `/remarket-backend/chat_open.php` | `product_id`；**需 token**，取得或建立「該商品 + 目前買家」的會話，回傳 `id` |
+| GET | `/remarket-backend/chat_detail.php?id=` | **需 token**，會話詳情＋訊息＋議價；僅買家／賣家可讀 |
+| GET | `/remarket-backend/chat_conversations.php` | **需 token**，我的所有會話與最後一則訊息 |
+| POST | `/remarket-backend/send_message.php` | `conversation_id`, `content`；**需 `Authorization: Bearer`**，`sender` 由後端決定 |
+| GET | `/remarket-backend/chat_stream.php?conversation_id=&token=` | **SSE 串流**；EventSource 不能帶 header，token 走 query，後端驗證會話成員 |
+| GET | `/remarket-backend/offer_state.php?product_id=` | **需 token**，目前買家對該商品的最新出價狀態；沒有出價回 `null` |
+| POST | `/remarket-backend/offer_create.php` | **需 token**：`conversation_id, amount`；同一會話同時只能有一筆待回覆或已同意的出價 |
+| POST | `/remarket-backend/offer_reply.php` | **需 token**（賣家）：`offer_id, action=accept|reject`；同意後會作廢同會話其他待回覆出價 |
 | POST | `/remarket-backend/auth_register.php` | `username`, `password`（≥6 字） |
 | POST | `/remarket-backend/auth_login.php` | `username`, `password`；回傳 `token` 與 `user` |
 | GET | `/remarket-backend/auth_me.php` | 需 token，回傳目前使用者 |
@@ -114,7 +130,9 @@ backend/           <-- 需複製到 XAMPP 的 htdocs
 
 - `products`：基本欄位＋`status`（available/sold）、`seller`（賣家帳號）、`condition_label`（商品狀況）、`delivery_method`（交易方式）、`is_negotiable`（0/1 可議價）
 - `product_images`：一對多商品圖片（`product_id` 外鍵，刪除商品時級聯清理）
-- `messages`：聊天訊息（`product_id` 外鍵、`sender`、`content`、`image` 圖片路徑、`created_at`）
+- `conversations`：會話（`product_id` + `buyer` 唯一，`seller` 冗餘記錄賣家）
+- `messages`：聊天訊息（`conversation_id`、`product_id` 外鍵、`sender`、`content`、`image` 圖片路徑、`created_at`）
+- `offers`：議價（`conversation_id`、`product_id`、`buyer`、`amount`、`status`：pending／accepted／rejected）
 - `users`：帳號（`username` 唯一、`password_hash`、登入用 `token` 與到期時間）
 - `auctions` / `bids` / `auction_messages`：拍賣場次、出價紀錄、房間留言（外鍵連商品／拍賣）
 
@@ -132,8 +150,8 @@ npm run test:e2e    # Playwright 端到端
 - 後端回傳的圖片是相對路徑（`uploads/xxx.jpg`），前端用 `environment.apiBaseUrl` 組成完整網址；換位置只改這一行。
 - 專案跑在 **zoneless** 模式：非同步更新畫面後要手動 `cdr.markForCheck()`。
 - `is_negotiable` 資料庫存 0/1，但 PDO 會回傳 `"0"`/`"1"` 字串——判斷時要 `Number()` 轉換，直接寫 `@if` 會把 `"0"` 當真值。
-- 「我的」頁以 `localStorage`（`remarket.myListings` / `remarket.favorites`）記住自己刊登與收藏的商品；聊天暱稱與對話清單分別存在 `remarket.nickname` / `remarket.chatProducts`。
-- **即時聊天用 SSE**：`chat_stream.php` 每 25 秒主動結束連線讓瀏覽器重連（避免長期佔用 Apache worker），重連時瀏覽器會帶 `Last-Event-ID`，所以不會漏訊息或重複。
+- 「我的」頁以 `localStorage`（`remarket.myListings` / `remarket.favorites`）記住自己刊登與收藏的商品；對話清單改由後端 `conversations` 表提供，前端只在 `remarket.lastRead` 記住每條會話讀到哪。
+- **即時聊天用 SSE**：以會話為單位，`chat_stream.php` 每 25 秒主動結束連線讓瀏覽器重連（避免長期佔用 Apache worker），重連時瀏覽器會帶 `Last-Event-ID`，所以不會漏訊息或重複。
 - **拍賣出價也走 SSE**：`auction_stream.php` 推送新出價；寫入用 `SELECT … FOR UPDATE` 鎖住場次，避免兩人同時出價造成重複。
 - PHP 與 MySQL 時區要一致：`auth_common.php` 設 `Asia/Hong_Kong`，PDO 連線設 `SET time_zone = '+08:00'`，否則拍賣開始／結束時間會差 8 小時。
 
@@ -141,7 +159,8 @@ npm run test:e2e    # Playwright 端到端
 
 - 有簡單登入（帳號／密碼＋token），但沒有角色權限、也沒有「忘記密碼」；token 有效期 7 天。
 - 商品以 `products.seller` 記錄賣家，編輯／刪除 API 會檢查是否本人；舊資料 seller 為空時才退回 localStorage。
-- 商品詳情頁的「出價」仍是模擬（Toast），真正可用的競價在「拍賣」分頁。
+- 商品詳情頁的「出價」：同一買家同時只能有一筆待回覆或已同意的出價；待回覆時按鈕顯示「等待賣家回覆」，賣家同意後顯示「賣家已同意」（都不能再出價），賣家拒絕後才可按「再次出價」，聊天室的議價卡片也可直接再次出價。離開再進入詳情頁時會重新向後端確認狀態。同意後尚未自動生成訂單或鎖定庫存。
+- 聊天室商品卡片的「去付款」為介面佔位，尚未接支付流程。
 - SSE 每個連線會佔用一個 Apache worker，示範用（2–3 人）足夠，不適合大量併發。
 - 相片上傳單張上限 5MB、最多 8 張，伺服器端不做二次壓縮。
 - 地圖使用 OpenStreetMap 圖磚，需連網。

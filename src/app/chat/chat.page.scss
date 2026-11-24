@@ -1,56 +1,114 @@
+:host {
+  --chat-brown: #7d5638;
+  --chat-bid-bg: #f0e3de;
+  --chat-input-bg: #ebe8e1;
+}
+
 .chat-content {
-  --background: var(--ion-background-color);
+  --background: var(--rm-paper);
 }
 
-/* 角色提示條：讓使用者知道自己是買家還是賣家 */
-.role-bar {
-  --background: var(--ion-card-background);
-  --min-height: 30px;
+.chat-header ion-toolbar {
+  --background: var(--rm-surface);
+  --color: var(--rm-ink);
+  --ion-toolbar-color: var(--rm-ink);
   --border-width: 0 0 1px 0;
-  --border-color: var(--rm-line, #e3d9c5);
+  --border-color: var(--rm-line);
+  box-shadow: none;
 }
 
-.role {
-  padding: 5px 16px;
-  color: var(--rm-muted, #8d7c68);
+.chat-header ion-back-button {
+  --color: var(--rm-ink);
+  color: var(--rm-ink);
+}
+
+.chat-header ion-title {
+  font-family: var(--ion-font-family);
+  font-style: normal;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--rm-ink);
+  text-align: start;
+  white-space: nowrap;
+}
+
+.product-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 28px);
+  margin: 10px 14px 0;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--rm-surface);
+  box-shadow: 0 2px 10px rgb(44 30 21 / 6%);
+  cursor: pointer;
+}
+
+.product-thumb {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--rm-paper-deep);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.product-thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rm-muted);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+  /* product-card 是 <button>，預設 text-align: center，這裡改回左對齊 */
+  text-align: left;
+}
+
+.product-price {
+  margin: 0;
+  color: var(--rm-ink);
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.product-status {
+  margin: 3px 0 0;
+  color: var(--rm-muted);
   font-size: 12px;
 }
 
-.name-card {
-  margin: 32px 20px;
-  padding: 20px;
-  border-radius: 14px;
-  background: var(--ion-card-background);
-  box-shadow: 0 2px 10px rgb(0 0 0 / 6%);
-
-  h2 {
-    margin: 0 0 6px;
-    color: var(--ion-text-color);
-    font-size: 17px;
-    font-weight: 600;
-  }
-
-  p {
-    margin: 0 0 16px;
-    color: var(--rm-muted, #8d7c68);
-    font-size: 13px;
-  }
-}
-
-.name-input {
-  --background: var(--ion-background-color);
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --padding-top: 10px;
-  --padding-bottom: 10px;
-  margin-bottom: 14px;
-  border-radius: 10px;
+.pay-btn {
+  --border-radius: 22px;
+  --background: var(--rm-accent);
+  --background-activated: var(--ion-color-primary-shade);
+  --box-shadow: none;
+  height: 42px;
+  margin: 0;
+  padding-inline: 22px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .empty {
   padding: 64px 24px;
   text-align: center;
-  color: var(--rm-muted, #8d7c68);
+  color: var(--rm-ink-soft);
 
   p {
     margin: 0 0 6px;
@@ -58,15 +116,89 @@
 }
 
 .hint {
-  color: var(--rm-muted, #9aa89d);
+  color: var(--rm-muted);
   font-size: 13px;
 }
 
 .messages {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 14px 12px 20px;
+}
+
+.bid-block {
+  width: 100%;
+}
+
+.bid-msg-card {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--chat-bid-bg, #f0e3de);
+}
+
+.bid-title {
+  margin: 0 0 12px;
+  color: var(--rm-ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.bid-divider {
+  height: 1px;
+  margin-bottom: 12px;
+  background: rgb(44 30 21 / 10%);
+}
+
+.bid-line {
+  margin: 0;
+  color: var(--rm-ink-soft);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.bid-amount {
+  margin-right: 6px;
+  color: var(--rm-ink);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.bid-unread {
+  margin: 4px 2px 0 0;
+  color: var(--rm-muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.bid-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+
+  ion-button {
+    --border-radius: 10px;
+    margin: 0;
+  }
+
+  .accept-btn {
+    --background: var(--chat-brown);
+    --box-shadow: none;
+    font-weight: 700;
+  }
+
+  .reject-btn {
+    --border-color: var(--chat-brown);
+    --color: var(--chat-brown);
+    --border-width: 1.5px;
+  }
+
+  .reoffer-btn {
+    --background: var(--rm-accent);
+    --box-shadow: none;
+    font-weight: 700;
+  }
 }
 
 .row {
@@ -81,13 +213,14 @@
 .bubble {
   max-width: 76%;
   padding: 10px 12px;
-  border-radius: 14px 14px 14px 4px;
-  background: var(--ion-card-background);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 6%);
+  border-radius: 18px 18px 18px 4px;
+  background: var(--rm-surface);
+  box-shadow: 0 1px 4px rgb(44 30 21 / 6%);
 
   .row.mine & {
-    border-radius: 14px 14px 4px 14px;
-    background: var(--ion-color-primary);
+    border-radius: 18px 18px 4px 18px;
+    background: var(--chat-brown);
+    box-shadow: 0 1px 4px rgb(44 30 21 / 10%);
   }
 }
 
@@ -98,19 +231,75 @@
   margin-bottom: 6px;
   border-radius: 8px;
   object-fit: cover;
+  cursor: zoom-in;
 }
 
-/* 傳相片按鈕 */
+.sender {
+  margin: 0 0 3px;
+  color: var(--rm-muted);
+  font-size: 11px;
+}
+
+.text {
+  margin: 0;
+  color: var(--rm-ink);
+  font-size: 14px;
+  line-height: 1.45;
+  word-break: break-word;
+  white-space: pre-wrap;
+
+  .row.mine & {
+    color: #fff7ef;
+  }
+}
+
+.time {
+  margin: 4px 0 0;
+  color: var(--rm-muted);
+  font-size: 10px;
+  text-align: right;
+
+  .row.mine & {
+    color: rgb(255 247 239 / 65%);
+  }
+}
+
+.quick-row {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px 0;
+  overflow-x: auto;
+}
+
+.quick-chip {
+  --background: var(--rm-surface);
+  --color: var(--rm-ink);
+  flex: 0 0 auto;
+  height: 34px;
+  margin: 0;
+  border: 1px solid var(--rm-line);
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+
 .photo-btn {
   position: relative;
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: var(--rm-paper-deep);
+  background: var(--chat-input-bg, #ebe8e1);
   color: var(--rm-ink-soft);
 
   ion-icon {
@@ -130,58 +319,58 @@
   }
 }
 
-.sender {
-  margin: 0 0 3px;
-  color: var(--rm-muted, #8d7c68);
-  font-size: 11px;
-}
-
-.text {
-  margin: 0;
-  color: var(--ion-text-color);
-  font-size: 14px;
-  line-height: 1.45;
-  word-break: break-word;
-  white-space: pre-wrap;
-
-  .row.mine & {
-    color: var(--ion-color-primary-contrast);
-  }
-}
-
-.time {
-  margin: 4px 0 0;
-  color: var(--rm-muted, #a7b5aa);
-  font-size: 10px;
-  text-align: right;
-
-  .row.mine & {
-    color: rgb(255 247 239 / 65%);
-  }
-}
-
-.composer {
+.input-box {
   display: flex;
+  flex: 1;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  border-radius: 22px;
+  background: var(--chat-input-bg, #ebe8e1);
 
   ion-input {
-    --background: var(--ion-background-color);
-    /* 外層 footer 是深色，不指定文字顏色會繼承成淺色，跟輸入框背景撞色 */
-    --color: var(--ion-text-color);
-    --placeholder-color: var(--rm-muted, #8d7c68);
-    --padding-start: 12px;
+    --background: transparent;
+    --color: var(--rm-ink);
+    --placeholder-color: var(--rm-muted);
+    --padding-start: 14px;
     --padding-end: 12px;
-    --padding-top: 8px;
-    --padding-bottom: 8px;
-    border-radius: 20px;
+    --padding-top: 9px;
+    --padding-bottom: 9px;
+  }
+}
+
+.send-btn {
+  --border-radius: 50%;
+  --box-shadow: none;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+
+  ion-icon {
+    font-size: 22px;
   }
 
-  ion-button {
-    --border-radius: 50%;
-    width: 42px;
-    height: 42px;
-    margin: 0;
+  /* 未輸入時也保持紅色與白色圖示，避免整顆按鈕淡到看不見 */
+  &[disabled] {
+    opacity: 1;
+  }
+}
+
+/* 底部輸入區：實色底、頂部髮絲線、不被訊息列表覆蓋 */
+.chat-footer {
+  --background: var(--rm-paper);
+  background: var(--rm-paper);
+  border-top: 1px solid var(--rm-line);
+  box-shadow: 0 -4px 12px rgb(44 30 21 / 6%);
+  z-index: 10;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  ion-toolbar {
+    --background: var(--rm-paper);
+    --border-width: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --min-height: 0;
   }
 }

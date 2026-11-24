@@ -5,12 +5,19 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonHeader,
+  IonIcon,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
   IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { alertCircleOutline } from 'ionicons/icons';
 
 import { AuctionService } from '../services/auction.service';
 import { AuthService } from '../services/auth.service';
@@ -29,7 +36,12 @@ import { Product, ProductService } from '../services/product.service';
     IonBackButton,
     IonTitle,
     IonContent,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonChip,
     IonButton,
+    IonIcon,
     IonSpinner,
   ],
 })
@@ -51,7 +63,15 @@ export class AuctionCreatePage implements OnInit {
     private auth: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    addIcons({ alertCircleOutline });
+  }
+
+  get selectedProduct(): Product | undefined {
+    return this.myProducts.find(
+      (product) => Number(product.id) === Number(this.selectedProductId),
+    );
+  }
 
   async ngOnInit() {
     const start = new Date(Date.now() + 10 * 60 * 1000);
@@ -66,6 +86,7 @@ export class AuctionCreatePage implements OnInit {
 
       if (this.myProducts.length > 0) {
         this.selectedProductId = Number(this.myProducts[0].id);
+        this.onProductSelected();
       }
     } catch (error) {
       this.error = error instanceof Error ? error.message : '無法載入商品';
@@ -73,6 +94,31 @@ export class AuctionCreatePage implements OnInit {
       this.isLoading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  imageUrl(path?: string): string | undefined {
+    return this.productService.imageUrl(path);
+  }
+
+  onProductSelected() {
+    const product = this.selectedProduct;
+    const current = String(this.startPrice ?? '').trim();
+
+    if (product && (current === '' || Number.isNaN(Number(current)))) {
+      this.startPrice = Number(product.price);
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  setStartAtIn(minutes: number) {
+    this.startAt = this.toInputValue(new Date(Date.now() + minutes * 60 * 1000));
+    this.cdr.markForCheck();
+  }
+
+  setEndAtIn(minutes: number) {
+    this.endAt = this.toInputValue(new Date(Date.now() + minutes * 60 * 1000));
+    this.cdr.markForCheck();
   }
 
   async submit() {

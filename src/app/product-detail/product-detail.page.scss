@@ -20,7 +20,6 @@ ion-back-button {
   color: var(--rm-ink);
 }
 
-/* 內縮圓角大圖：像一張放在奶油紙上的照片卡 */
 .photo-container {
   position: relative;
   margin: 4px 20px 0;
@@ -29,34 +28,35 @@ ion-back-button {
   background: var(--rm-paper-deep);
 }
 
-.photo-scroll {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
+#product-gallery {
   width: 100%;
   aspect-ratio: 5 / 4;
-  -webkit-overflow-scrolling: touch;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-.photo-item {
-  flex: 0 0 100%;
-  width: 100%;
-  height: 100%;
-  scroll-snap-align: start;
-
-  .hero {
-    display: block;
+  swiper-slide {
     width: 100%;
     height: 100%;
-    object-fit: cover;
 
-    &.is-sold {
-      filter: grayscale(1);
-      opacity: 0.88;
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: zoom-in;
+
+      &.is-sold {
+        filter: grayscale(1);
+        opacity: 0.88;
+      }
+    }
+  }
+
+  .swiper-pagination-bullet {
+    background: white;
+    opacity: 0.55;
+
+    &.swiper-pagination-bullet-active {
+      background: var(--rm-accent);
+      opacity: 1;
     }
   }
 }
@@ -66,6 +66,7 @@ ion-back-button {
   width: 100%;
   aspect-ratio: 5 / 4;
   object-fit: cover;
+  cursor: zoom-in;
 
   &.is-sold {
     filter: grayscale(1);
@@ -118,7 +119,6 @@ ion-back-button {
   letter-spacing: 0.04em;
 }
 
-/* 內容直接流在奶油紙上：襯線大標題 → 次要行 → 粗價格 → 白膠囊 → 列表 */
 .body {
   padding: 18px 24px 30px;
 }
@@ -308,4 +308,8 @@ ion-content.has-buyer-bar {
   .contact-btn {
     --box-shadow: 0 10px 22px rgb(142 59 43 / 28%);
   }
+}
+
+ion-icon.is-favorite {
+  color: var(--rm-accent);
 }

@@ -1,5 +1,4 @@
 <?php
-// 登出：把 token 清掉
 require __DIR__ . '/auth_common.php';
 
 try {

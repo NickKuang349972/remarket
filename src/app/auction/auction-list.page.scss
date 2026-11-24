@@ -1,5 +1,13 @@
 .auction-content {
-  --background: var(--ion-background-color);
+  --background: var(--rm-paper);
+}
+
+.auction-header ion-toolbar {
+  --background: var(--rm-paper);
+  --color: var(--rm-ink);
+  --ion-toolbar-color: var(--rm-ink);
+  --border-width: 0;
+  box-shadow: none;
 }
 
 .loading {
@@ -21,7 +29,7 @@
   padding: 10px;
   border: 1px solid var(--rm-line);
   border-radius: 16px;
-  background: var(--ion-card-background);
+  background: var(--rm-surface);
   text-align: left;
   cursor: pointer;
 }
@@ -34,7 +42,7 @@
   width: 92px;
   height: 92px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--rm-paper-deep);
   color: var(--rm-muted);
   font-size: 11px;
@@ -53,9 +61,10 @@
   h2 {
     margin: 4px 0 6px;
     overflow: hidden;
-    color: var(--ion-text-color);
-    font-size: 15px;
-    font-weight: 600;
+    color: var(--rm-ink);
+    font-size: 15.5px;
+    font-weight: 700;
+    line-height: 1.35;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -69,33 +78,42 @@
 }
 
 .state {
-  padding: 3px 9px;
+  padding: 4px 10px;
+  border: 1px solid var(--rm-line);
   border-radius: 999px;
-  background: var(--rm-paper-deep);
+  background: var(--rm-surface);
   color: var(--rm-ink-soft);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 
   &.live {
+    border-color: transparent;
     background: var(--rm-accent-soft);
-    color: var(--ion-color-primary);
+    color: var(--rm-accent);
   }
 
   &.ended {
-    opacity: 0.6;
+    border-color: transparent;
+    background: var(--rm-paper-deep);
+    color: var(--rm-muted);
   }
 }
 
 .time {
   color: var(--rm-muted);
-  font-size: 11px;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
 }
 
 .price {
   margin: 0;
-  color: var(--ion-color-primary);
-  font-size: 14px;
+  color: var(--rm-ink);
+  font-size: 15.5px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 
 .leader {
@@ -107,7 +125,7 @@
 .empty {
   padding: 64px 24px;
   text-align: center;
-  color: var(--rm-muted);
+  color: var(--rm-ink-soft);
 
   p {
     margin: 0 0 6px;
@@ -115,5 +133,6 @@
 }
 
 .hint {
+  color: var(--rm-muted);
   font-size: 13px;
 }

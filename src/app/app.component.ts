@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
+import { register } from 'swiper/element/bundle';
 
 import { AuthService } from './services/auth.service';
+
+register();
 
 @Component({
   selector: 'app-root',

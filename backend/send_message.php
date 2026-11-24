@@ -1,5 +1,4 @@
 <?php
-// 傳送聊天訊息（可附一張圖片；必須登入，發送者由 token 判定）
 require __DIR__ . '/auth_common.php';
 
 $uploadDir = __DIR__ . '/uploads';
@@ -9,11 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond('error', '只接受 POST 請求');
 }
 
-$productId = $_POST['product_id'] ?? '';
+$conversationId = $_POST['conversation_id'] ?? '';
 $content = trim($_POST['content'] ?? '');
 
-if (!is_numeric($productId)) {
-    respond('error', '缺少商品編號');
+if (!is_numeric($conversationId)) {
+    respond('error', '缺少對話編號');
 }
 if ($content === '' && empty($_FILES['image']['name'])) {
     respond('error', '訊息不能為空');
@@ -25,14 +24,8 @@ if (mb_strlen($content) > 500) {
 try {
     $pdo = db();
     $user = require_user($pdo);
-
-    $check = $pdo->prepare("SELECT id FROM products WHERE id = :id");
-    $check->execute([':id' => $productId]);
-
-    if (!$check->fetch()) {
-        http_response_code(404);
-        respond('error', '找不到這件商品');
-    }
+    $conversation = require_conversation($pdo, $conversationId, $user);
+    $productId = $conversation['product_id'];
 
     $imagePath = '';
 
@@ -70,14 +63,15 @@ try {
     }
 
     $stmt = $pdo->prepare(
-        "INSERT INTO messages (product_id, sender, content, image)
-         VALUES (:product_id, :sender, :content, :image)"
+        "INSERT INTO messages (conversation_id, product_id, sender, content, image)
+         VALUES (:conversation_id, :product_id, :sender, :content, :image)"
     );
     $stmt->execute([
-        ':product_id' => $productId,
-        ':sender'     => $user['username'],
-        ':content'    => $content,
-        ':image'      => $imagePath,
+        ':conversation_id' => $conversationId,
+        ':product_id'      => $productId,
+        ':sender'          => $user['username'],
+        ':content'         => $content,
+        ':image'           => $imagePath,
     ]);
 
     respond('success', '已送出', ['id' => (int) $pdo->lastInsertId(), 'image' => $imagePath]);

@@ -47,7 +47,7 @@ export const routes: Routes = [
       import('./product-detail/product-detail.page').then((m) => m.ProductDetailPage),
   },
   {
-    path: 'chat/:productId',
+    path: 'chat/:conversationId',
     canActivate: [authGuard],
     loadComponent: () => import('./chat/chat.page').then((m) => m.ChatPage),
   },

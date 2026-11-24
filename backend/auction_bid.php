@@ -1,5 +1,4 @@
 <?php
-// 出價
 require __DIR__ . '/auth_common.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -23,7 +22,6 @@ try {
 
     $pdo->beginTransaction();
 
-    // 鎖住這一場拍賣，避免兩個人同時出價造成重複（race condition）
     $stmt = $pdo->prepare(
         "SELECT id, seller, start_at, end_at, start_price, min_increment
          FROM auctions WHERE id = :id FOR UPDATE"

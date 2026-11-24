@@ -50,7 +50,6 @@ export class AuctionListPage implements OnDestroy {
     void this.load();
 
     if (!this.timer) {
-      // 每 10 秒刷新一次狀態（即將開始 → 進行中 → 已結束）
       this.timer = setInterval(() => void this.load(), 10000);
     }
   }

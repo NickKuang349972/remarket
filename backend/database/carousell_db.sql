@@ -7,7 +7,9 @@ USE carousell_db;
 DROP TABLE IF EXISTS auction_messages;
 DROP TABLE IF EXISTS bids;
 DROP TABLE IF EXISTS auctions;
+DROP TABLE IF EXISTS offers;
 DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS conversations;
 DROP TABLE IF EXISTS product_images;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS users;
@@ -43,7 +45,7 @@ INSERT INTO products (id, title, price, description, category, address, lat, lng
 (3, '瑜伽墊 5mm 連啞鈴一對', 260, '搬屋急讓！瑜伽墊連 1kg / 2kg 啞鈴一對，一套攞齊 HK$260。有使用痕跡（第二張圖係使用場景），衛生抵用。順豐到付或沙田交收。', '運動', '沙田', 22.37700000, 114.19740000, 'sold', '阿明', '明显使用痕迹', '顺丰快递', 0),
 (4, 'Nike AF1 07 全白 US8.5', 250, 'Nike Air Force 1 07 全白，US8.5 / UK7.5，著過兩三次，好新淨。旺角面交或順豐到付。', '服飾', '旺角', 22.31850000, 114.16900000, 'available', '阿明', '99新', '顺丰快递', 0),
 (5, '金庸作品集 平裝全套', 80, '金庸作品集平裝全套，書齡耐，書頁有黃斑同少量筆記，介意勿擾。觀塘自取或順豐到付。', '書籍', '觀塘', 22.30900000, 114.22550000, 'sold', '陳小姐', '明显使用痕迹', '顺丰快递', 0),
-(6, 'LEGO Ideas Polaroid 相機 21345', 450, '砌過一次，全部件齊、有說明書，無盒。白淨無黃，擺出嚟好靚。將軍澳面交。', '其他', '將軍澳', 22.31700000, 114.26400000, 'sold', '阿明', '99新', '面交', 0);
+(6, 'LEGO Ideas Polaroid 相機 21345', 450, '砌過一次，全部件齊、有說明書，無盒。白淨無黃，擺出嚟好靚。第二張係真版 Polaroid 對照，還原度一目了然。將軍澳面交。', '其他', '將軍澳', 22.31700000, 114.26400000, 'sold', '阿明', '99新', '面交', 0);
 
 INSERT INTO product_images (product_id, path) VALUES
 (1, 'demo-images/ipad.jpg'),
@@ -53,12 +55,30 @@ INSERT INTO product_images (product_id, path) VALUES
 (3, 'demo-images/yoga.jpg'),
 (3, 'demo-images/yoga-2.jpg'),
 (4, 'demo-images/sneakers.jpg'),
+(4, 'demo-images/sneakers-2.jpg'),
 (5, 'demo-images/books.jpg'),
-(6, 'demo-images/lego.jpg');
+(5, 'demo-images/books-2.jpg'),
+(6, 'demo-images/lego.jpg'),
+(6, 'demo-images/lego-2.jpg');
 
--- 即時聊天（A2）：SSE 串流用的訊息表
+CREATE TABLE conversations (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  product_id INT(11) NOT NULL,
+  buyer VARCHAR(30) NOT NULL,
+  seller VARCHAR(30) NOT NULL DEFAULT '',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uniq_product_buyer (product_id, buyer),
+  KEY idx_buyer (buyer),
+  KEY idx_seller (seller),
+  CONSTRAINT fk_conversations_product
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
 CREATE TABLE messages (
   id INT(11) NOT NULL AUTO_INCREMENT,
+  conversation_id INT(11) NOT NULL,
   product_id INT(11) NOT NULL,
   sender VARCHAR(50) NOT NULL,
   content TEXT NOT NULL,
@@ -66,20 +86,43 @@ CREATE TABLE messages (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_product (product_id, id),
+  KEY idx_conversation (conversation_id, id),
   CONSTRAINT fk_messages_product
-    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+  CONSTRAINT fk_messages_conversation
+    FOREIGN KEY (conversation_id) REFERENCES conversations (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
--- 示範對話（買家「阿明」向賣家查詢 iPad）
-INSERT INTO messages (product_id, sender, content) VALUES
-(1, '阿明', '你好，想問下部 iPad 仲有冇貨？'),
-(1, '陳小姐', '有貨呀，連 Apple Pencil 一齊，你幾時得閒交收？'),
-(1, '阿明', '聽日下晝銅鑼灣站可以嗎？');
+CREATE TABLE offers (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  conversation_id INT(11) NOT NULL,
+  product_id INT(11) NOT NULL,
+  buyer VARCHAR(50) NOT NULL,
+  amount INT(11) NOT NULL,
+  status VARCHAR(10) NOT NULL DEFAULT 'pending',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_offer_product (product_id, id),
+  KEY idx_conversation (conversation_id, id),
+  CONSTRAINT fk_offers_product
+    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+  CONSTRAINT fk_offers_conversation
+    FOREIGN KEY (conversation_id) REFERENCES conversations (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
--- 使用者帳號（登入系統；密碼用 PHP password_hash 加密）
+INSERT INTO conversations (id, product_id, buyer, seller) VALUES
+(1, 1, '阿明', '陳小姐');
+
+INSERT INTO messages (conversation_id, product_id, sender, content) VALUES
+(1, 1, '阿明', '你好，想問下部 iPad 仲有冇貨？'),
+(1, 1, '陳小姐', '有貨呀，連 Apple Pencil 一齊，你幾時得閒交收？'),
+(1, 1, '阿明', '聽日下晝銅鑼灣站可以嗎？');
+
 CREATE TABLE users (
   id INT(11) NOT NULL AUTO_INCREMENT,
   username VARCHAR(30) NOT NULL,
+  nickname VARCHAR(50) NOT NULL DEFAULT '',
   password_hash VARCHAR(255) NOT NULL,
   token VARCHAR(64) DEFAULT NULL,
   token_expires DATETIME DEFAULT NULL,
@@ -89,7 +132,6 @@ CREATE TABLE users (
   KEY idx_token (token)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
--- 拍賣會（A2 即時競價）
 CREATE TABLE auctions (
   id INT(11) NOT NULL AUTO_INCREMENT,
   product_id INT(11) NOT NULL,
@@ -127,7 +169,6 @@ CREATE TABLE auction_messages (
   CONSTRAINT fk_auction_message FOREIGN KEY (auction_id) REFERENCES auctions (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
--- 示範拍賣：匯入時即刻「進行中」，方便直接示範即時競價
 INSERT INTO auctions (product_id, seller, start_at, end_at, start_price, min_increment) VALUES
 (1, '陳小姐', DATE_SUB(NOW(), INTERVAL 10 MINUTE), DATE_ADD(NOW(), INTERVAL 3 HOUR), 2000, 50);
 

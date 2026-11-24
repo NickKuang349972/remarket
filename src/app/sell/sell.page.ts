@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import {
   IonButton,
   IonContent,
-  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
@@ -12,9 +11,7 @@ import {
   IonSelectOption,
   IonSpinner,
   IonTextarea,
-  IonTitle,
   IonToggle,
-  IonToolbar,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { cameraOutline, close } from 'ionicons/icons';
@@ -33,9 +30,6 @@ const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
   standalone: true,
   imports: [
     FormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonIcon,
     IonItem,

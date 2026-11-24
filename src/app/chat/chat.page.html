@@ -1,57 +1,122 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+<ion-header [translucent]="true" class="chat-header">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" text="返回"></ion-back-button>
     </ion-buttons>
 
     <ion-title>{{ product?.title || '聊天' }}</ion-title>
   </ion-toolbar>
-
-  <ion-toolbar class="role-bar">
-    <div class="role">
-      @if (isOwner) {
-        <span>你是賣家 · 這裡是買家的查詢</span>
-      } @else {
-        <span>你正在聯絡賣家 · 以「{{ auth.username }}」的身分</span>
-      }
-    </div>
-  </ion-toolbar>
 </ion-header>
 
-<ion-content #chatContent [fullscreen]="true" class="chat-content">
-  @if (messages.length === 0) {
+<ion-content #chatContent class="chat-content">
+  @if (product) {
+    <button type="button" class="product-card" (click)="goToProduct()">
+      @if (product.image) {
+        <img class="product-thumb" [src]="imageUrl(product.image)" [alt]="product.title" />
+      } @else {
+        <div class="product-thumb product-thumb-empty">暫無圖片</div>
+      }
+
+      <div class="product-info">
+        <p class="product-price">HK$ {{ latestOffer?.amount ?? product.price }}</p>
+        <p class="product-status">{{ latestOffer ? dealStatusText(latestOffer) : '還沒有出價' }}</p>
+      </div>
+
+      <ion-button class="pay-btn" (click)="payOffer($event)">去付款</ion-button>
+    </button>
+  }
+
+  @if (messages.length === 0 && offers.length === 0) {
     <div class="empty">
       <p>還沒有訊息</p>
       <p class="hint">打聲招呼吧 👋</p>
     </div>
   } @else {
     <div class="messages">
-      @for (message of messages; track message.id) {
-        <div class="row" [class.mine]="isMine(message)">
-          <div class="bubble">
-            @if (!isMine(message)) {
-              <p class="sender">{{ message.sender }}</p>
-            }
+      @for (item of timeline; track item.sortKey) {
+        @if (item.kind === 'offer') {
+          <div class="bid-block">
+            <div class="bid-msg-card">
+              <p class="bid-title">{{ offerBubbleTitle(item.offer) }}</p>
+              <div class="bid-divider"></div>
+              <p class="bid-line">
+                <span class="bid-amount">HK$ {{ item.offer.amount }}</span>
+                {{ offerNote(item.offer) }}
+              </p>
 
-            @if (message.image) {
-              <img class="bubble-image" [src]="imageUrl(message.image)" alt="聊天圖片" />
-            }
+              @if (canReplyTo(item.offer)) {
+                <div class="bid-actions">
+                  <ion-button
+                    size="small"
+                    class="accept-btn"
+                    (click)="replyToOffer(item.offer, 'accept')"
+                  >
+                    同意
+                  </ion-button>
+                  <ion-button
+                    size="small"
+                    fill="outline"
+                    class="reject-btn"
+                    (click)="replyToOffer(item.offer, 'reject')"
+                  >
+                    拒絕
+                  </ion-button>
+                </div>
+              }
 
-            @if (message.content) {
-              <p class="text">{{ message.content }}</p>
-            }
+              @if (canReofferFor(item.offer)) {
+                <div class="bid-actions">
+                  <ion-button size="small" class="reoffer-btn" (click)="reoffer()">
+                    再次出價
+                  </ion-button>
+                </div>
+              }
+            </div>
 
-            <p class="time">{{ message.created_at }}</p>
+            @if (item.offer.status === 'pending') {
+              <p class="bid-unread">未讀</p>
+            }
           </div>
-        </div>
+        } @else {
+          <div class="row" [class.mine]="isMine(item.message)">
+            <div class="bubble">
+              @if (!isMine(item.message)) {
+                <p class="sender">{{ item.message.sender }}</p>
+              }
+
+              @if (item.message.image) {
+                <img
+                  class="bubble-image"
+                  [src]="imageUrl(item.message.image)"
+                  alt="聊天圖片"
+                  (click)="openImagePreview(item.message)"
+                />
+              }
+
+              @if (item.message.content) {
+                <p class="text">{{ item.message.content }}</p>
+              }
+
+              <p class="time">{{ formatMessageTime(item.message.created_at) }}</p>
+            </div>
+          </div>
+        }
       }
     </div>
   }
 </ion-content>
 
 @if (auth.isLoggedIn) {
-  <ion-footer>
+  <ion-footer class="chat-footer">
     <ion-toolbar>
+      @if (!draft.trim()) {
+        <div class="quick-row">
+          @for (reply of quickReplies; track reply) {
+            <ion-chip class="quick-chip" (click)="useQuickReply(reply)">{{ reply }}</ion-chip>
+          }
+        </div>
+      }
+
       <div class="composer">
         <label class="photo-btn" [class.disabled]="isUploading">
           @if (isUploading) {
@@ -67,13 +132,20 @@
           />
         </label>
 
-        <ion-input
-          placeholder="輸入訊息…"
-          [(ngModel)]="draft"
-          (keyup.enter)="send()"
-        ></ion-input>
+        <div class="input-box">
+          <ion-input
+            placeholder="輸入訊息…"
+            [(ngModel)]="draft"
+            (keyup.enter)="send()"
+          ></ion-input>
+        </div>
 
-        <ion-button (click)="send()" [disabled]="isSending || !draft.trim()">
+        <ion-button
+          class="send-btn"
+          color="primary"
+          (click)="send()"
+          [disabled]="isSending || !draft.trim()"
+        >
           @if (isSending) {
             <ion-spinner name="dots"></ion-spinner>
           } @else {

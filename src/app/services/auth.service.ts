@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 export interface AppUser {
   id: number;
   username: string;
+  nickname?: string;
 }
 
 interface AuthResponse {
@@ -47,9 +48,16 @@ export class AuthService {
     return new HttpHeaders({ Authorization: `Bearer ${this.token}` });
   }
 
-  async register(username: string, password: string): Promise<void> {
+  async register(username: string, password: string, nickname?: string): Promise<void> {
+    const form = this.form(username, password);
+    const trimmedNickname = (nickname ?? '').trim();
+
+    if (trimmedNickname) {
+      form.append('nickname', trimmedNickname);
+    }
+
     const response = await firstValueFrom(
-      this.http.post<AuthResponse>(`${this.baseUrl}/auth_register.php`, this.form(username, password)),
+      this.http.post<AuthResponse>(`${this.baseUrl}/auth_register.php`, form),
     );
 
     this.applySession(response);
@@ -73,13 +81,11 @@ export class AuthService {
         ),
       );
     } catch {
-      // 就算後端失敗，前端也要清掉，避免卡在「已登入」的假象
     }
 
     this.clearSession();
   }
 
-  /** App 啟動時用 token 向後端確認身分；token 過期就自動登出 */
   async restore(): Promise<void> {
     if (!this.token) {
       return;

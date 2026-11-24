@@ -1,5 +1,18 @@
 .room-content {
-  --background: var(--ion-background-color);
+  --background: var(--rm-paper);
+}
+
+.room-header ion-toolbar {
+  --background: var(--rm-paper);
+  --color: var(--rm-ink);
+  --ion-toolbar-color: var(--rm-ink);
+  --border-width: 0;
+  box-shadow: none;
+}
+
+.room-header ion-back-button {
+  --color: var(--rm-ink);
+  color: var(--rm-ink);
 }
 
 .loading {
@@ -11,16 +24,23 @@
 .empty {
   padding: 64px 24px;
   text-align: center;
-  color: var(--rm-muted);
+  color: var(--rm-ink-soft);
+}
+
+.photo-card {
+  margin: 4px 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--rm-paper-deep);
 }
 
 .hero {
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: var(--rm-paper-deep);
 
   img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -32,16 +52,18 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  min-height: 160px;
   color: var(--rm-muted);
   font-size: 13px;
+  letter-spacing: 0.04em;
 }
 
 .panel {
   margin: 12px 14px;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--rm-line);
   border-radius: 16px;
-  background: var(--ion-card-background);
+  background: var(--rm-surface);
 }
 
 .head {
@@ -52,33 +74,40 @@
 }
 
 .state {
-  padding: 3px 10px;
+  padding: 4px 10px;
+  border: 1px solid var(--rm-line);
   border-radius: 999px;
-  background: var(--rm-paper-deep);
+  background: var(--rm-surface);
   color: var(--rm-ink-soft);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 
   &.live {
+    border-color: transparent;
     background: var(--rm-accent-soft);
-    color: var(--ion-color-primary);
+    color: var(--rm-accent);
   }
 
   &.ended {
-    opacity: 0.6;
+    border-color: transparent;
+    background: var(--rm-paper-deep);
+    color: var(--rm-muted);
   }
 }
 
 .countdown {
   color: var(--rm-muted);
-  font-size: 12px;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
 }
 
 .title {
   margin: 10px 0 12px;
-  color: var(--ion-text-color);
-  font-family: var(--rm-display-font, Georgia, serif);
+  color: var(--rm-ink);
   font-size: 20px;
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -86,7 +115,7 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--rm-line);
   border-bottom: 1px solid var(--rm-line);
 }
@@ -94,15 +123,18 @@
 .label {
   margin: 0;
   color: var(--rm-muted);
-  font-size: 11px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 .value {
   margin: 2px 0 0;
-  color: var(--ion-color-primary);
+  color: var(--rm-ink);
   font-size: 24px;
   font-weight: 700;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
+  line-height: 1.15;
 }
 
 .leader {
@@ -117,15 +149,16 @@
   p {
     margin: 0 0 2px;
     color: var(--rm-muted);
-    font-size: 11.5px;
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
   }
 }
 
 .description {
   margin: 12px 0 0;
   color: var(--rm-ink-soft);
-  font-size: 13.5px;
-  line-height: 1.6;
+  font-size: 14.5px;
+  line-height: 1.8;
   white-space: pre-wrap;
 }
 
@@ -145,32 +178,40 @@
   margin-top: 12px;
 
   ion-input {
-    --background: var(--ion-background-color);
-    --color: var(--ion-text-color);
+    --background: var(--rm-surface);
+    --color: var(--rm-ink);
     --padding-start: 12px;
     --padding-end: 12px;
     --padding-top: 10px;
     --padding-bottom: 10px;
+    border: 1px solid var(--rm-line);
     border-radius: 10px;
   }
 
   ion-button {
     flex: 0 0 auto;
     margin: 0;
+    --border-radius: 12px;
+  }
+
+  .bid-btn {
+    --box-shadow: 0 10px 22px rgb(142 59 43 / 28%);
+    font-weight: 700;
   }
 }
 
 .hint {
   margin: 8px 0 0;
   color: var(--rm-muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .section {
   margin: 0 0 10px;
-  color: var(--ion-text-color);
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--rm-ink);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .bids,
@@ -200,16 +241,16 @@
   .when {
     margin-left: auto;
     color: var(--rm-muted);
-    font-size: 10.5px;
+    font-size: 12px;
   }
 }
 
 .bids .amount {
-  color: var(--ion-color-primary);
+  color: var(--rm-ink);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
 .messages .text {
-  color: var(--ion-text-color);
+  color: var(--rm-ink);
 }

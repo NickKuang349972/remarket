@@ -32,20 +32,42 @@
         autocomplete="username"
       ></ion-input>
 
+      @if (mode === 'register') {
+        <ion-input
+          class="field"
+          placeholder="暱稱（選填，讓買家更易認得你）"
+          [(ngModel)]="nickname"
+          autocomplete="nickname"
+          [maxlength]="50"
+        ></ion-input>
+      }
+
       <ion-input
         class="field"
         type="password"
         placeholder="密碼（至少 6 個字）"
         [(ngModel)]="password"
         (keyup.enter)="submit()"
-        autocomplete="current-password"
+        [autocomplete]="mode === 'login' ? 'current-password' : 'new-password'"
       ></ion-input>
 
+      <ion-checkbox
+        class="remember"
+        labelPlacement="end"
+        justify="start"
+        [(ngModel)]="rememberMe"
+      >
+        記住用戶名
+      </ion-checkbox>
+
       @if (error) {
-        <p class="error">{{ error }}</p>
+        <div class="error-box">
+          <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+          <span>{{ error }}</span>
+        </div>
       }
 
-      <ion-button expand="block" [disabled]="isLoading" (click)="submit()">
+      <ion-button expand="block" class="submit" [disabled]="isLoading" (click)="submit()">
         @if (isLoading) {
           <ion-spinner name="dots"></ion-spinner>
         } @else {
@@ -57,7 +79,7 @@
         @if (mode === 'login') {
           沒有帳號？按上面的「註冊」建立一個。
         } @else {
-          註冊後會自動登入，資料存在本機瀏覽器。
+          可以填一個暱稱讓買家認得你；註冊後會自動登入。
         }
       </p>
     </div>

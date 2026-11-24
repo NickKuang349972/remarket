@@ -1,7 +1,7 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+<ion-header [translucent]="true" class="room-header">
+  <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/auction" text="返回"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/auction" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>拍賣會</ion-title>
   </ion-toolbar>
@@ -13,7 +13,7 @@
   } @else if (error) {
     <div class="empty">{{ error }}</div>
   } @else if (auction) {
-    <div class="hero">
+    <div class="photo-card">
       @if (auction.image) {
         <img [src]="imageUrl(auction.image)" [alt]="auction.title" />
       } @else {
@@ -63,7 +63,7 @@
             [placeholder]="'最低 HK$ ' + minimumBid"
             [(ngModel)]="draftBid"
           ></ion-input>
-          <ion-button [disabled]="!auth.isLoggedIn" (click)="placeBid()">出價</ion-button>
+          <ion-button class="bid-btn" [disabled]="!auth.isLoggedIn" (click)="placeBid()">出價</ion-button>
         </div>
         @if (!auth.isLoggedIn) {
           <p class="hint">請先登入才能出價</p>

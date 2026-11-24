@@ -4,6 +4,7 @@ import { addIcons } from 'ionicons';
 import { addCircleOutline, hammerOutline, homeOutline, mapOutline, personOutline } from 'ionicons/icons';
 
 import { ChatService } from '../services/chat.service';
+import { AuthService } from '../services/auth.service';
 import { UserDataService } from '../services/user-data.service';
 
 @Component({
@@ -20,6 +21,7 @@ export class TabsPage implements OnDestroy {
 
   constructor(
     private chatService: ChatService,
+    private auth: AuthService,
     private cdr: ChangeDetectorRef,
     public userData: UserDataService,
   ) {
@@ -37,15 +39,18 @@ export class TabsPage implements OnDestroy {
   }
 
   private async refreshUnread() {
-    if (!this.userData.myListingIds.length && !this.userData.chatProductIds.length) {
+    if (!this.auth.isLoggedIn) {
       this.setUnread(0);
       return;
     }
 
     try {
       const conversations = await this.chatService.getConversations();
+      const me = this.auth.username;
       const unread = conversations.filter(
-        (item) => Number(item.id) > this.userData.lastReadOf(Number(item.product_id)),
+        (item) =>
+          item.sender !== me &&
+          Number(item.last_message_id ?? 0) > this.userData.lastReadOf(item.conversation_id),
       ).length;
 
       this.setUnread(unread);

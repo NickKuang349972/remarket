@@ -1,5 +1,4 @@
 <?php
-// 註冊新帳號
 require __DIR__ . '/auth_common.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -9,12 +8,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $username = trim($_POST['username'] ?? '');
 $password = $_POST['password'] ?? '';
+$nickname = trim($_POST['nickname'] ?? '');
 
 if (mb_strlen($username) < 2 || mb_strlen($username) > 20) {
     respond('error', '用戶名長度需為 2–20 個字');
 }
 if (mb_strlen($password) < 6) {
     respond('error', '密碼至少 6 個字');
+}
+if (mb_strlen($nickname) > 50) {
+    respond('error', '暱稱最長 50 個字');
 }
 
 try {
@@ -30,19 +33,24 @@ try {
     $token = bin2hex(random_bytes(24));
 
     $stmt = $pdo->prepare(
-        "INSERT INTO users (username, password_hash, token, token_expires)
-         VALUES (:username, :password_hash, :token, DATE_ADD(NOW(), INTERVAL 7 DAY))"
+        "INSERT INTO users (username, nickname, password_hash, token, token_expires)
+         VALUES (:username, :nickname, :password_hash, :token, DATE_ADD(NOW(), INTERVAL 7 DAY))"
     );
 
     $stmt->execute([
         ':username'      => $username,
+        ':nickname'      => $nickname,
         ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
         ':token'         => $token,
     ]);
 
     respond('success', '註冊成功', [
         'token' => $token,
-        'user'  => ['id' => (int) $pdo->lastInsertId(), 'username' => $username],
+        'user'  => [
+            'id'       => (int) $pdo->lastInsertId(),
+            'username' => $username,
+            'nickname' => $nickname,
+        ],
     ]);
 
 } catch (PDOException $e) {

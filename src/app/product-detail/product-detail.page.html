@@ -10,7 +10,7 @@
           <ion-icon
             slot="icon-only"
             [name]="isFavorite ? 'heart' : 'heart-outline'"
-            [style.color]="isFavorite ? '#8e3b2b' : '#2c1e15'"
+            [class.is-favorite]="isFavorite"
           ></ion-icon>
         </ion-button>
 
@@ -40,24 +40,26 @@
   } @else if (product) {
     <div class="photo-container">
       @if (product.images && product.images.length > 0) {
-        <div class="photo-scroll">
-          @for (img of product.images; track img) {
-            <div class="photo-item">
+        <swiper-container id="product-gallery" pagination="true">
+          @for (img of product.images; track img; let i = $index) {
+            <swiper-slide>
               <img
                 class="hero"
                 [class.is-sold]="isSold"
                 [src]="imageUrl(img)"
                 [alt]="product.title"
+                (click)="openImagePreview(i)"
               />
-            </div>
+            </swiper-slide>
           }
-        </div>
+        </swiper-container>
       } @else if (product.image) {
         <img
-          class="hero"
+          class="hero single"
           [class.is-sold]="isSold"
           [src]="imageUrl(product.image)"
           [alt]="product.title"
+          (click)="openImagePreview(0)"
         />
       } @else {
         <div class="photo-placeholder">暫無圖片</div>
@@ -158,9 +160,15 @@
 
 @if (showBuyerBar) {
   <div class="buyer-action-bar">
-    <ion-button class="offer-btn" fill="outline" expand="block" (click)="makeOffer()">
+    <ion-button
+      class="offer-btn"
+      fill="outline"
+      expand="block"
+      [disabled]="!canMakeOffer"
+      (click)="makeOffer()"
+    >
       <ion-icon slot="start" name="pricetag-outline"></ion-icon>
-      出價
+      {{ offerButtonText }}
     </ion-button>
 
     <ion-button class="contact-btn" expand="block" (click)="contactSeller()">

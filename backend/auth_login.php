@@ -1,5 +1,4 @@
 <?php
-// 登入
 require __DIR__ . '/auth_common.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -17,7 +16,7 @@ if ($username === '' || $password === '') {
 try {
     $pdo = db();
 
-    $stmt = $pdo->prepare("SELECT id, username, password_hash FROM users WHERE username = :username");
+    $stmt = $pdo->prepare("SELECT id, username, nickname, password_hash FROM users WHERE username = :username");
     $stmt->execute([':username' => $username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -26,7 +25,6 @@ try {
         respond('error', '用戶名或密碼不正確');
     }
 
-    // 每次登入換一個新 token
     $token = bin2hex(random_bytes(24));
 
     $update = $pdo->prepare(
@@ -36,7 +34,11 @@ try {
 
     respond('success', '登入成功', [
         'token' => $token,
-        'user'  => ['id' => (int) $user['id'], 'username' => $user['username']],
+        'user'  => [
+            'id'       => (int) $user['id'],
+            'username' => $user['username'],
+            'nickname' => $user['nickname'] ?? '',
+        ],
     ]);
 
 } catch (PDOException $e) {

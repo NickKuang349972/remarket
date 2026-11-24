@@ -46,7 +46,6 @@ ion-content {
   padding: 0 20px 32px;
 }
 
-/* 統計：髮絲線夾住的平鋪雙欄，中間一道直分隔線 */
 .stats {
   display: flex;
   margin-top: 20px;
@@ -180,7 +179,6 @@ ion-label {
   font-size: 12px;
 }
 
-/* 對話列表：最後一則訊息預覽 */
 .preview {
   display: -webkit-box;
   margin: 5px 0 0;
@@ -191,7 +189,6 @@ ion-label {
   -webkit-line-clamp: 1;
 }
 
-/* 未讀紅點 */
 .unread-dot {
   flex: 0 0 auto;
   width: 9px;
