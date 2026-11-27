@@ -1,5 +1,8 @@
 # ReMarket — 二手買賣平台
 
+> **線上示範**：<https://remarket-ckl.netlify.app>
+> 前端部署在 Netlify；後端 PHP + MySQL 跑在本機 XAMPP，透過 Cloudflare Tunnel 對外，示範期間需要主機開機。
+
 以 **Ionic 9 + Angular 22** 製作的跨平台二手買賣 App，後端使用 **PHP + MySQL**（XAMPP）。
 介面為「暖調二手雜誌」風格：奶油紙底、深咖啡文字、磚紅只給選中態與主要操作，卡片採無框扁平排版。
 
