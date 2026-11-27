@@ -5,5 +5,5 @@ export const environment = {
    * 注意：這是 quick tunnel 的隨機網址，cloudflared 重新啟動就會改變，
    * 屆時要更新這裡並重新 build。
    */
-  apiBaseUrl: 'https://starring-tri-freeze-sagem.trycloudflare.com/remarket-backend',
+  apiBaseUrl: 'https://color-ccd-learn-cal.trycloudflare.com/remarket-backend',
 };
